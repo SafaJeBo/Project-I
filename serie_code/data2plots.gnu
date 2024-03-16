@@ -1,15 +1,15 @@
-#gnuplot script for plotting E, U, and Kin as a function of iteration
-set term postscript eps
+# gnuplot script for plotting E, U, and Kin as a function of iteration
+#set term postscript enhanced color eps
+set term pdf
 
-set output 'Esvst.eps'
+##### ENERGY VS TIME #####
+set output 'Esvst.pdf'
 
 set autoscale
 set xlabel "Time (simulation)"
 set ylabel "Energy"
 set title "Energy components evolution during simulation"
-set xr [0:100]
-set yr [-750:350]
-set xtics 5000
+#set yr [-750:350]
 set key vertical
 set key outside
 
@@ -28,15 +28,14 @@ replot
 pause 1
 unset output
 
-#Eergy oscilation
-set output 'Evst_osc.eps'
+##### TOTAL ENERGY OSCILATIONS #####
+set output 'Evst_osc.pdf'
 
 set autoscale
 set xlabel "Time (simulation)"
 set ylabel "Energy"
-set title "Energy oscilation during simulation"
-set xr [0:200]
-set yr [-450:-250]
+set title "Total energy oscilation during simulation"
+#set yr [-450:-250]
 
 set linetype 4 lc rgb "dark-orange" 
 plot 'thermodynamics.dat' u 1:4 t 'Etot' with lp lt 4 ps 0.5, \
@@ -45,15 +44,14 @@ rep
 pause 10
 unset output
 
-#Tinst evolution
-set output 'Tvst.eps'
+##### TEMPERATURE VS TIME #####
+set output 'Tvst.pdf'
 
 set autoscale
 set xlabel "Time (simulation)"
 set ylabel "Temperature"
 set title "Instant T evolution during simulation"
-set xr [0:200]
-set yr [0:2]
+#set yr [0:2]
 
 set linetype 5 lc rgb "dark-cyan"
 plot 'thermodynamics.dat' u 1:5 t 'Tinst' with lp lt 5 ps 0.5, \
@@ -62,15 +60,15 @@ rep
 pause 5
 unset output
 
-#Pressure evolution
-set output 'Pvst.eps'
+##### PRESSURE VS TIME #####
+set output 'Pvst.pdf'
 
 set autoscale
 set xlabel "Time (simulation)"
-set ylabel "Energy"
+set ylabel "Pressure"
 set title "Pressure evolution during simulation"
-set xr [0:200]
-set yr [0:10]
+#set xr [0:200]
+#set yr [0:10]
 
 set linetype 6 lc rgb "gold"
 plot 'thermodynamics.dat' u 1:7 t 'Pressure' with lp lt 7 ps 0.5, \
@@ -79,35 +77,34 @@ rep
 pause 5
 unset output
 
-#TvsP
-set output 'TvsP.eps'
+##### PRESSURE VS TEMPERATURE #####
+set output 'PvsT.pdf'
 
 set autoscale
-set xlabel "Temprature"
+set xlabel "Temperature"
 set ylabel "Pressure"
-set title "Temp. vs Press. in reduced units"
-set xr [0:200]
-set yr [0:10]
+set title "Press. vs Temp. in reduced units"
+#set xr [0:200]
+#set yr [0:10]
 
 set linetype 7 lc rgb "violet" lw 1 dashtype 1 
-plot 'thermodynamics.dat' u 5:7 t 'T=f(P)' with lp lt 7, \
+plot 'thermodynamics.dat' u 5:7 t 'P=f(T)' with lp lt 7 ps 0.5, \
 
 rep
 pause 5
 unset output
 
-#Radial distribution function/ pair distribution function
-
-set output 'RDF.eps'
+##### RADIAL DISTRIBUTION FUNCTION / PAIR DISTRIBUTION FUNCTION #####
+set output 'RDF.pdf'
 
 set autoscale
 set title 'RDF for two fixed particles in a LJ fluid'
-set xlabel 'r'
+set xlabel 'Radius'
 set ylabel'RDF'
 
 set linetype 8 lc rgb "dark-blue" lw 1 pt 7 dt 2
 
-plot 'resultsrdflong_def.dat' u 1:2 t'RDF' with lp lt 8 ps 0.75
+plot 'resultsrdflong_def.dat' u 1:2 t'RDF' with lp lt 8 ps 0.5
 
 rep
 pause 5
