@@ -23,7 +23,7 @@ run:
 plot: $(datafile)
 	gnuplot data2plots.gnu
 	mkdir -p figures
-	mv *.pdf figures 
+	mv *.png figures 
 
 ## clean: removes all .o and .mod files
 .PHONY : clean

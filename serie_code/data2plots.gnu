@@ -1,9 +1,8 @@
 # gnuplot script for plotting E, U, and Kin as a function of iteration
-#set term postscript enhanced color eps
-set term pdf
+set term png
 
 ##### ENERGY VS TIME #####
-set output 'Esvst.pdf'
+set output 'Esvst.png'
 
 set autoscale
 set xlabel "Time (simulation)"
@@ -29,13 +28,12 @@ pause 1
 unset output
 
 ##### TOTAL ENERGY OSCILATIONS #####
-set output 'Evst_osc.pdf'
+set output 'Evst_osc.png'
 
 set autoscale
 set xlabel "Time (simulation)"
 set ylabel "Energy"
 set title "Total energy oscilation during simulation"
-#set yr [-450:-250]
 
 set linetype 4 lc rgb "dark-orange" 
 plot 'thermodynamics.dat' u 1:4 t 'Etot' with lp lt 4 ps 0.5, \
@@ -45,7 +43,7 @@ pause 10
 unset output
 
 ##### TEMPERATURE VS TIME #####
-set output 'Tvst.pdf'
+set output 'Tvst.png'
 
 set autoscale
 set xlabel "Time (simulation)"
@@ -61,7 +59,7 @@ pause 5
 unset output
 
 ##### PRESSURE VS TIME #####
-set output 'Pvst.pdf'
+set output 'Pvst.png'
 
 set autoscale
 set xlabel "Time (simulation)"
@@ -78,7 +76,7 @@ pause 5
 unset output
 
 ##### PRESSURE VS TEMPERATURE #####
-set output 'PvsT.pdf'
+set output 'PvsT.png'
 
 set autoscale
 set xlabel "Temperature"
@@ -95,7 +93,7 @@ pause 5
 unset output
 
 ##### RADIAL DISTRIBUTION FUNCTION / PAIR DISTRIBUTION FUNCTION #####
-set output 'RDF.pdf'
+set output 'RDF.png'
 
 set autoscale
 set title 'RDF for two fixed particles in a LJ fluid'
