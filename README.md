@@ -138,11 +138,14 @@ The folder should have the following structure after launching the program. Note
 │── statistics
 │   ├── ekin_mean.dat		! Mean and standard deviation of kinetical energy.
 │   ├── epot_mean.dat		! Mean and standard deviation of potential energy.
+│   ├── etot_mean.dat		! Mean and standard deviation of total energy.
 │   ├── msdval_mean.dat		! Mean and standard deviation of MSD.
 │   ├── press_mean.dat		! Mean and standard deviation of pressure.
 │   ├── temp_mean.dat		! Mean and standard deviation of temperature.
 │
-│── Makefile			
+│── Makefile
+│── binning
+│── binning.f90    ! Module for block average.		
 │── data2plots.gnu		! Gnuplot script.
 │── forces.f90 			! Module with forces calculation.
 │── initialize.f90 		! Module with initialization and pbc.
@@ -154,7 +157,7 @@ The folder should have the following structure after launching the program. Note
 │── thermodynamics.dat		! Contains thermodynamic data: kinetical, potential and total energy, instantaneous temperature, MSD, pressure.
 └── thermodynamics.f90		! Module with observables.  
   
-2 directories, 17 files.       
+3 directories, 25 files.       
 ```
 
 ## Expected Results
