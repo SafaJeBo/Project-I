@@ -1,10 +1,10 @@
-<div style="width: 65%;">
-    
-## Serial MD code 						
-   <img src="https://github.com/Eines-Informatiques-Avancades/awesome-readme/blob/master/icon.png" alt="Logo" width="100" style="position: absolute; top: 10px; right: 10px;">
-This repository hosts Fortran90 programs tailored for serial molecular dynamics simulations.  
-Data analysis of the generated data is conducted utilizing gnuplot.  
+<div style="position: relative; width: 65%;">
+    <img src="https://github.com/Eines-Informatiques-Avancades/awesome-readme/blob/master/icon.png" alt="Logo" width="100" style="position: absolute; top: 10px; right: 10px;">
+    <h2>Serial MD code</h2>
+    <p>This repository hosts Fortran90 programs tailored for serial molecular dynamics simulations. Data analysis of the generated data is conducted utilizing gnuplot.</p>
+</div>
 
+<div style="width: 65%;">
 ## Table of Contents
 1. [Install](#install)
    1. [Requirements](#requirements)
