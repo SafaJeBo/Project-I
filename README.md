@@ -3,8 +3,10 @@
 ---
 title: "Serial MD code"
 logo: "https://github.com/Eines-Informatiques-Avancades/awesome-readme/blob/master/icon.png"
-description: This repository hosts Fortran90 programs tailored for serial molecular dynamics simulations. Data analysis of the generated data is conducted utilizing gnuplot.
+description: |
+  This repository hosts Fortran90 programs tailored for serial molecular dynamics simulations. Data analysis of the generated data is conducted utilizing gnuplot.
 ---
+
 
 ## Table of Contents
 1. [Install](#install)
