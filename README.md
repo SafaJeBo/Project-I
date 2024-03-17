@@ -1,9 +1,12 @@
 <div style="width: 65%;">
-
-## Serial MD code 						
-
+<p align="right" width="100%">
+   <img src="https://github.com/Eines-Informatiques-Avancades/awesome-readme/blob/master/icon.png" alt="Logo" width="75" style="position: absolute; top: 10px; right: 10px;">
+</p>  
+   
+## Serial MD code 	
 This repository hosts Fortran90 programs tailored for serial molecular dynamics simulations.  
 Data analysis of the generated data is conducted utilizing gnuplot.
+
 
 ## Table of Contents
 1. [Install](#install)
@@ -52,6 +55,11 @@ make plot
 ```
 Generates plots based on the program's data output.  
 
+```bash
+make stats
+```
+Generates statistics file with info on mean and standart deviation.
+
 ## Program structure
 
 ### Main program
@@ -66,6 +74,8 @@ The modules required to compile the main program are:
 - initialize.f90: Contains subroutines for system initialization and applying periodic boundary conditions.
 - integrate.f90: Contains subroutines for the Velocity Verlet integrator, Andersen thermostat, and Gaussian distribution.
 - thermodynamics.f90: Contains subroutines for calculating different observables of the simulation.  
+- binning.f90: Performs block average method and calculates the mean and standard deviation of observables.
+  
 Additionally, the following files are used for proper functioning:
 - input.txt: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
 - data2plots.gnu: Generates figures from the data generated in the simulation.
@@ -84,6 +94,10 @@ The makefile offers the following options:
   - Runs plots from data in datafile and moves them to a new folder.
     ```
     make plot
+    ```
+  - Generates statiscs file with info on mean and standard deviation of observables.
+    ```
+    make stats
     ```
   - Removes all .o and .mod files
     ```
@@ -122,7 +136,17 @@ The folder should have the following structure after launching the program. Note
 │   ├── RDF.pdf			! Plot of radial distribution function.
 │   ├── Tvst.pdf		! Plot of temperature vs time.
 │
-│── Makefile			
+│── statistics
+│   ├── ekin_mean.dat		! Mean and standard deviation of kinetical energy.
+│   ├── epot_mean.dat		! Mean and standard deviation of potential energy.
+│   ├── etot_mean.dat		! Mean and standard deviation of total energy.
+│   ├── msdval_mean.dat		! Mean and standard deviation of MSD.
+│   ├── press_mean.dat		! Mean and standard deviation of pressure.
+│   ├── temp_mean.dat		! Mean and standard deviation of temperature.
+│
+│── Makefile
+│── binning
+│── binning.f90                 ! Module for block average.		
 │── data2plots.gnu		! Gnuplot script.
 │── forces.f90 			! Module with forces calculation.
 │── initialize.f90 		! Module with initialization and pbc.
@@ -134,19 +158,19 @@ The folder should have the following structure after launching the program. Note
 │── thermodynamics.dat		! Contains thermodynamic data: kinetical, potential and total energy, instantaneous temperature, MSD, pressure.
 └── thermodynamics.f90		! Module with observables.  
   
-2 directories, 17 files.       
+3 directories, 25 files.       
 ```
 
 ## Expected Results
 The generated plots should look like:  
 
-![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/Esvst.pdf)  
+![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/Esvst.png)  
 Figure 1: Energy components evolution during the simulation.
 
-![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/PvsT.pdf)  
+![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/PvsT.png)  
 Figure 2: Pressure of the system respect to its temperature.
 
-![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/RDF.pdf)  
+![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/RDF.png)  
 Figure 3: Radial distribution function of the simulation.
 
 ## Contributors
