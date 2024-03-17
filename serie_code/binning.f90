@@ -4,13 +4,14 @@ program binning_gestor
     integer(8) :: dat_num, ii, mcs, num_lines, iunit
     integer :: file_status
     double precision, dimension(:), allocatable :: times, ekin, epot, etot, temp, msdval, press
-    double precision :: time
+    double precision :: time, ek, ep, et, t, mm, p
     !!real(dp) :: ek, ep, et, t, mm, p, total_energy, total_magnetization
     character(len=100) :: filename
 
     ! Ask user for the file name 
-    print*, "Enter the name of the file:"
-    read(*,*) filename
+!    print*, "Enter the name of the file:"
+!    read(*,*) filename
+    filename = "thermodynamics.dat"
 
     ! Open the file
     open(unit=10, file=filename, status='old', action='read', iostat=iunit)
@@ -28,7 +29,7 @@ program binning_gestor
         num_lines = num_lines + 1
     enddo
 
-    ! Close the file
+        ! Close the file
     close(10)
     print*, "Number of lines:", num_lines
 
@@ -40,6 +41,29 @@ program binning_gestor
     allocate(temp(num_lines))
     allocate(msdval(num_lines))
     allocate(press(num_lines))
+
+    ! Open the file again
+    open(unit=10, file=filename, status='old', action='read', iostat=iunit)
+    !Check the file opened successfully
+    if (iunit /= 0) then
+        print*, "Error opening file"
+        stop
+    endif
+    do ii = 1,num_lines
+        read(10, *, iostat=iunit) time, ek, ep, et, t, mm, p
+        times(ii)=time
+        ekin(ii)=ek
+        epot(ii)=ep
+        etot(ii)=et
+        temp(ii)=t
+        msdval(ii)=mm
+        press(ii)=p
+    enddo
+
+    ! Close the file
+    close(10)
+    print*, "Number of lines:", num_lines
+
 
     ! Call binning subroutine
     call binning(ekin, num_lines, "ekin_mean.dat", file_status)
@@ -111,8 +135,8 @@ contains
              return
         endif
 
-        write(1,'(A, E20.10, A, E20.10)') "La mitjana estadistica es:", med_mean, &
-                                " i la desviació estandar es:", med_std
+        write(1,*) "Mean value is:", med_mean, &
+                                " and standard deviation is:", med_std
 
         close(1)
     end subroutine binning
