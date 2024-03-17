@@ -75,6 +75,7 @@ The modules required to compile the main program are:
 - integrate.f90: Contains subroutines for the Velocity Verlet integrator, Andersen thermostat, and Gaussian distribution.
 - thermodynamics.f90: Contains subroutines for calculating different observables of the simulation.  
 - binning.f90: Performs block average method and calculates the mean and standard deviation of observables.
+  
 Additionally, the following files are used for proper functioning:
 - input.txt: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
 - data2plots.gnu: Generates figures from the data generated in the simulation.
