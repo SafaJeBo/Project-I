@@ -146,7 +146,7 @@ The folder should have the following structure after launching the program. Note
 │
 │── Makefile
 │── binning
-│── binning.f90            ! Module for block average.		
+│── binning.f90                ! Module for block average.		
 │── data2plots.gnu		! Gnuplot script.
 │── forces.f90 			! Module with forces calculation.
 │── initialize.f90 		! Module with initialization and pbc.
