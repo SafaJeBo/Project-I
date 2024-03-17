@@ -3,7 +3,7 @@ OPTIMITZADOR=-o
 
 datafile=thermodynamics.dat
 zip_init=mainmods.zip
-EPSS=$(wildcard *.eps)
+EPSS=$(wildcard *.png)
 
 ## main: generates the main program
 main : initialize.o forces.o integrate.o thermodynamics.o main.o
@@ -12,6 +12,8 @@ main : initialize.o forces.o integrate.o thermodynamics.o main.o
 %.o : %.f90
 	$(COMPILADOR) -c $^
 
+binning : binning.o
+	$(COMPILADOR) $(OPTIMITZADOR) $@ $^
 
 ## run: executes the main program
 .PHONY : run
@@ -24,6 +26,13 @@ plot: $(datafile)
 	gnuplot data2plots.gnu
 	mkdir -p figures
 	mv *.png figures 
+
+## stats: generates statistics
+.PHONY: stats
+stats: $(datafile) binning
+	./binning
+	mkdir -p statistics
+	mv *mean.dat statistics
 
 ## clean: removes all .o and .mod files
 .PHONY : clean
