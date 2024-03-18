@@ -17,6 +17,7 @@ Data analysis of the generated data is conducted utilizing gnuplot.
    2. [Modules](#modules)
    3. [Makefile](#makefile)
 4. [Expected Results](#expected-results)
+   1. [Justification of the results](#justification-of-the-results)
 5. [Contributors](#contributors)
 
 
@@ -74,11 +75,11 @@ The modules required to compile the main program are:
 - initialize.f90: Contains subroutines for system initialization and applying periodic boundary conditions.
 - integrate.f90: Contains subroutines for the Velocity Verlet integrator, Andersen thermostat, and Gaussian distribution.
 - thermodynamics.f90: Contains subroutines for calculating different observables of the simulation.  
-- binning.f90: Performs block average method and calculates the mean and standard deviation of observables.
-  
+
 Additionally, the following files are used for proper functioning:
 - input.txt: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
-- data2plots.gnu: Generates figures from the data generated in the simulation.
+- data2plots.gnu: Generates figures from the data generated in the simulation.  
+- binning.f90: Performs block average method and calculates the mean and standard deviation of observables.
 
 ### Makefile
 The makefile offers the following options:  
@@ -173,11 +174,16 @@ Figure 2: Pressure of the system respect to its temperature.
 ![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/RDF.png)  
 Figure 3: Radial distribution function of the simulation.
 
+### Justification of the results
+In this simulation, the system was modeled at a temperature T = 300K and a density of 3.749 g/L, mirroring the conditions typical of Kr gas.
+The interaction between particles was defined using the Lennard-Jones potential, with parameters ε/kB = 162.58 K and σ = 3.6274 angstrom.  
+The parameters were extracted from Rutkai et al. (Rutkai G.; Thol M.; Span R.; Vrabec J. How Well Does the Lennard-Jones Potential Represent the Thermodynamic Properties of Noble Gases?. Mol. Phys. 2017, 115, 1104–1121.)  
+
 ## Contributors
-Pau Franquesa (Cond. inicials i de contorn)  
-Pau Eritja (Forces)  
-Safae el Jelloui (Estadística i visualització resultats)  
-Marcos Carrera (Integració)  
-Berta Bori (Coordinació i integració de tot el codi)
+[Pau Franquesa](https://github.com/PFranqV) (Initial conditions and pbc)  
+[Pau Eritja](https://github.com/PauEritja) (Forces)  
+[Safae el Jelloui](https://github.com/SafaJeBo) (Statistics and visualization of results)  
+[Marcos Carrera](https://github.com/Marcos-C-A) (Integration)  
+[Berta Bori](https://github.com/bbobru) (Coordination and integration of the code)
 
 </div>
