@@ -79,6 +79,7 @@ The modules required to compile the main program are:
 Additionally, the following files are used for proper functioning:
 - input.txt: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
 - data2plots.gnu: Generates figures from the data generated in the simulation.  
+- data2plots_adSI.gnu: Generates figures in SI units.  
 - binning.f90: Performs block average method and calculates the mean and standard deviation of observables.
 
 ### Makefile
@@ -129,13 +130,20 @@ The folder should have the following structure after launching the program. Note
  
 ```
 │
-│── figures
-│   ├── Esvst.pdf		! Plot of energy vs time.
-│   ├── Evst_osc.pdf		! Plot of total energy oscilations.
-│   ├── PvsT.pdf		! Plot of pressure vs temperature.
-│   ├── Pvst.pdf		! Plot of pressure vs time.
-│   ├── RDF.pdf			! Plot of radial distribution function.
-│   ├── Tvst.pdf		! Plot of temperature vs time.
+│── Figs_SIunits
+│   ├── Esvst_SI.png		! Plot of energy components vs time in SI units.
+│   ├── Evst_osc_SI.png		! Plot of total energy oscilations in SI units.
+│   ├── PvsT_SI.png		! Plot of pressure vs temperature in SI units.
+│   ├── Pvst_SI.png		! Plot of pressure vs time in SI units.
+│   └── Tvst_SI.png		! Plot of temperature vs time in SI units.
+│
+│── Figs_redunits
+│   ├── Esvst.png		! Plot of energy vs time in reduced units.
+│   ├── Evst_osc.png		! Plot of total energy oscilations in reduced units.
+│   ├── PvsT.png		! Plot of pressure vs temperature in reduced units.
+│   ├── Pvst.png		! Plot of pressure vs time in reduced units.
+│   ├── RDF.png			! Plot of radial distribution function in reduced units.
+│   └── Tvst.png		! Plot of temperature vs time in reduced units.
 │
 │── statistics
 │   ├── ekin_mean.dat		! Mean and standard deviation of kinetical energy.
@@ -143,12 +151,13 @@ The folder should have the following structure after launching the program. Note
 │   ├── etot_mean.dat		! Mean and standard deviation of total energy.
 │   ├── msdval_mean.dat		! Mean and standard deviation of MSD.
 │   ├── press_mean.dat		! Mean and standard deviation of pressure.
-│   ├── temp_mean.dat		! Mean and standard deviation of temperature.
+│   └── temp_mean.dat		! Mean and standard deviation of temperature.
 │
 │── Makefile
 │── binning
 │── binning.f90                 ! Module for block average.		
 │── data2plots.gnu		! Gnuplot script.
+│── data2plots_adSI.gnu		! Gnuplot script in SI units.
 │── forces.f90 			! Module with forces calculation.
 │── initialize.f90 		! Module with initialization and pbc.
 │── input.txt			! input parameters.
@@ -159,19 +168,19 @@ The folder should have the following structure after launching the program. Note
 │── thermodynamics.dat		! Contains thermodynamic data: kinetical, potential and total energy, instantaneous temperature, MSD, pressure.
 └── thermodynamics.f90		! Module with observables.  
   
-3 directories, 25 files.       
+4 directories, 31 files.       
 ```
 
 ## Expected Results
 The generated plots should look like:  
 
-![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/Esvst.png)  
+![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_SIunits/Esvst_SI.png)  
 Figure 1: Energy components evolution during the simulation.
 
-![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/PvsT.png)  
+![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_SIunits/PvsT_SI.png)  
 Figure 2: Pressure of the system respect to its temperature.
 
-![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/figures/RDF.png)  
+![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_redunits/RDF.png)  
 Figure 3: Radial distribution function of the simulation.
 
 ### Justification of the results
