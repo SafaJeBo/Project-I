@@ -107,5 +107,3 @@ plot 'resultsrdflong_def.dat' u 1:2 t'RDF' with lp lt 8 ps 0.5
 rep
 pause 5
 unset output
-
-
