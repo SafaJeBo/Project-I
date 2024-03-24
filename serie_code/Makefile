@@ -55,7 +55,7 @@ super_clean:
 ## compress: compresses all the .f90 files and the Makefile to a ex1.tar.gz file
 .PHONY : compress
 compress:
-	tar -czvf ex1.tar.gz *.f90 makefile $(EPSS)
+	tar -czvf P1_serie.tar.gz * ../README.md 
 
 ## decompress: decompresses zip 
 .PHONY: decompress
