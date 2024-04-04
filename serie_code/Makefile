@@ -18,7 +18,7 @@ binning : binning.o
 ## run: executes the main program
 .PHONY : run
 run:
-	./main<input.txt &
+	./main<input.txt
 
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot

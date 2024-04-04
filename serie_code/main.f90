@@ -5,12 +5,12 @@ program main
     use forces
     use integrate
     use thermodynamics
-	
+
     ! variable declaration
     implicit none
     integer,parameter :: d=3!, N=125,nsim_temp=1000,nsim_tot=1000,numdr=1000
     integer :: N,nsim_temp,nsim_tot,numdr
-    integer :: M,i
+    integer :: M,i,j
     ! real(8) :: density,L,a,pos(N,d),vel(N,d),dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     ! real(8) :: timeini,timefin,pos0(N,d),msdval,rdf(numdr),r,deltar,volumdr,pi,press
@@ -40,7 +40,8 @@ program main
     ! opening files to save results
     open(15,file='thermodynamics.dat')
     open(16,file='resultsrdflong_def.dat')
-    
+
+
     ! getting the initial time to account for total simulation time
     call cpu_time(timeini)
     write(*,*)timeini
@@ -52,17 +53,23 @@ program main
     L=(dble(N)/density)**(1.d0/3.d0)
     M=int(N**(1.d0/3.d0))+1
     a=L/dble(M)
+    cutoff = L/2.d0
+
+    print *, L, cutoff, M, a
     
     call ini_pos_sc(N,a,M,d,pos)
     
     !Thermalization
+    print *, nsim_temp
     do i=1,nsim_temp
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
     enddo
-    
+    print *, "Finished Thermalization"    
+
+
     !Starting production run
     sigma=sqrt(temp2)
-    vel=0.d0
+    !vel=0.d0
     pos0=pos
     rdf=0d0
     
@@ -74,11 +81,12 @@ program main
             call msd(pos,N,d,pos0,L,msdval)
             call pression(pos,N,d,L,cutoff,press)
             temperatura=temp_inst(ke,N)
-            write(15,*)i*dt,ke,pot,pot+ke,temperatura,msdval,press
+            write(15,*)i*dt,ke,pot,pot+ke,temperatura,msdval,press+temperatura*density
 
             if (mod(i,50000).eq.0) then ! Control state of simulation
                 print*,i
             endif
+
 
             if (i.gt.1e3) then
                 ! g(r) mesures
@@ -98,6 +106,7 @@ program main
     
     call cpu_time(timefin)
     print*,'FINAL time = ',timefin-timeini
+
     
     end program main
     
