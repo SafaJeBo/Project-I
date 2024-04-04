@@ -60,7 +60,7 @@ program main
     call ini_pos_sc(N,a,M,d,pos)
     
     !Thermalization
-    print *, nsim_temp
+    sigma = sqrt(temp1)
     do i=1,nsim_temp
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
     enddo
