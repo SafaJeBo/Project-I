@@ -24,10 +24,10 @@ run:
 .PHONY: plot
 plot: $(datafile)
 	gnuplot data2plots.gnu  
-	mkdir Figs_redunits
+	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
 	gnuplot data2plots_adSI.gnu 
-	mkdir Figs_SIunits
+	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
 
 ## stats: generates statistics
