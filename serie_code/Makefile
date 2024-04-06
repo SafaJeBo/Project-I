@@ -18,16 +18,16 @@ binning : binning.o
 ## run: executes the main program
 .PHONY : run
 run:
-	./main<input.txt &
+	./main<input.txt
 
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
 plot: $(datafile)
 	gnuplot data2plots.gnu  
-	mkdir Figs_redunits
+	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
 	gnuplot data2plots_adSI.gnu 
-	mkdir Figs_SIunits
+	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
 
 ## stats: generates statistics

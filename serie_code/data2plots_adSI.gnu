@@ -4,18 +4,18 @@ set term png
 ## Constants
 uma = 1.66053906660e-27 # kg
 kb = 1.380649e-23 # J/K
-sig = 3.6274 # A
+sig = 3.6274e-10 # m
 dens_ = 0.0012 # adim
 mKr = 83.798*uma # kg
 e_kb = 162.58 # K*J/K=K
-t_coef = 1/(sqrt((e_kb*kb)/(mKr*sig**2))) *1e3 #ms
-dens = dens_*mKr / sig**3 
+t_coef = 1/(sqrt((e_kb*kb)/(mKr*sig**2))) *1e12 #ps
+dens = dens_*mKr / sig**3 # g/L 
 
 ##### ENERGY VS TIME #####
 set output 'Esvst_SI.png'
 
 set autoscale
-set xlabel "Time (ms)"
+set xlabel "Time (ps)"
 set ylabel "Energy (J)"
 set title "Energy components evolution during simulation"
 set key vertical
@@ -37,7 +37,7 @@ unset output
 set output 'Evst_osc_SI.png'
 
 set autoscale
-set xlabel "Time (ms)"
+set xlabel "Time (ps)"
 set ylabel "Energy (J)"
 set title "Total energy oscilation during simulation"
 
@@ -52,7 +52,7 @@ unset output
 set output 'Tvst_SI.png'
 
 set autoscale
-set xlabel "Time (ms)"
+set xlabel "Time (ps)"
 set ylabel "Temperature (K)"
 set title "Instant T evolution during simulation"
 #set yr [0:2]
@@ -68,7 +68,7 @@ unset output
 set output 'Pvst_SI.png'
 
 set autoscale
-set xlabel "Time (ms)"
+set xlabel "Time (ps)"
 set ylabel "Pressure (Pa)"
 set title "Pressure evolution during simulation"
 #set xr [0:200]
