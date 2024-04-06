@@ -53,7 +53,7 @@ program main
     L=(dble(N)/density)**(1.d0/3.d0)
     M=int(N**(1.d0/3.d0))+1
     a=L/dble(M)
-    cutoff = L/2.d0
+    ! cutoff = L/2.d0
 
     print *, L, cutoff, M, a
     
