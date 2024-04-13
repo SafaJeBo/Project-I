@@ -1,5 +1,5 @@
 COMPILADOR=gfortran
-OPTIMITZADOR=-o
+OPTIMITZADOR=-O2
 
 datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
@@ -7,17 +7,17 @@ EPSS=$(wildcard *.png)
 
 ## main: generates the main program
 main : initialize.o forces.o integrate.o thermodynamics.o main.o
-	$(COMPILADOR) $(OPTIMITZADOR) $@ $^
+	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
 
 %.o : %.f90
 	$(COMPILADOR) -c $^
 
 binning : binning.o
-	$(COMPILADOR) $(OPTIMITZADOR) $@ $^
+	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
 
 ## run: executes the main program
 .PHONY : run
-run:
+run: main
 	./main<input.txt
 
 ## plot: runs plots from data in datafile and move them
