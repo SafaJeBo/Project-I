@@ -11,9 +11,7 @@ program main
     integer,parameter :: d=3!, N=125,nsim_temp=1000,nsim_tot=1000,numdr=1000
     integer :: N,nsim_temp,nsim_tot,numdr
     integer :: M,i,j
-    ! real(8) :: density,L,a,pos(N,d),vel(N,d),dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
-    ! real(8) :: timeini,timefin,pos0(N,d),msdval,rdf(numdr),r,deltar,volumdr,pi,press
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
     real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:)
     character(15) :: dummy
@@ -31,19 +29,20 @@ program main
     read(*,*) dummy, nu
 
     pi=4d0*datan(1d0)
+
     ! Allocate variables
     allocate(pos(N,d))
     allocate(vel(N,d))
     allocate(pos0(N,d))
     allocate(rdf(numdr))
 
-    ! opening files to save results
+    ! Opening files to save results
     open(14,file='trajectory.xyz')
     open(15,file='thermodynamics.dat')
     open(16,file='resultsrdflong_def.dat')
 
 
-    ! getting the initial time to account for total simulation time
+    ! Getting the initial time to account for total simulation time
     call cpu_time(timeini)
     write(*,*)timeini
     
@@ -74,14 +73,13 @@ program main
 
     !Starting production run
     sigma=sqrt(temp2)
-    !vel=0.d0
     pos0=pos
     rdf=0d0
     
     do i=1,nsim_tot
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
         if (mod(i,100).eq.0) then
-            ! Mesures
+            ! Mesure energy, pressure and msd
             call kin_energy(vel,N,d,ke)
             call msd(pos,N,d,pos0,L,msdval)
             call pression(pos,N,d,L,cutoff,press)
@@ -92,15 +90,14 @@ program main
                 print*,i
             endif
 
-
+            ! Mesure RDF after a certain timestep
             if (i.gt.1e3) then
-                ! g(r) mesures
                 call gr(pos,N,d,numdr,L,rdf)
             endif
         endif
     enddo
     
-    !Normalització g(r)
+    ! Normalization of RDF
     r=0d0
     deltar=0.5d0*L/numdr
     do i=1,numdr
