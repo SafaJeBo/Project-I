@@ -1,26 +1,34 @@
-COMPILADOR=gfortran
-OPTIMITZADOR=-O2
+
+# MAKEFILE FOR PARALEL
+# !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
+# TO ACCESS IT DO:
+#			qsrh -q iqtc07.q -pe smp 1
+#			module load openmpi/2.0.1_ics-2015.0
+
+COMPILADOR=mpif90
+#OPTIMITZADOR=-O2
+numproc=2
 
 datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 
 ## main: generates the main program
-main : initialize.o forces.o integrate.o thermodynamics.o main.o
-	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
+main : MOD_INIT.o main.o
+	$(COMPILADOR) -o $@ $^
 
 %.o : %.f90
 	$(COMPILADOR) -c $^
 
 binning : binning.o
-	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
+	$(COMPILADOR) -o $@ $^
 
 ## run: executes the main program
 .PHONY : run
 run: main
-	./main<input.txt
+	mpirun -np $(numproc) main<input.txt
 
-## plot: runs plots from data in datafile and move them
+## plot: runs plots from data in datafile and move them (DOES NOT WORK YET!!!)
 .PHONY: plot
 plot: $(datafile)
 	gnuplot data2plots.gnu  
@@ -30,7 +38,7 @@ plot: $(datafile)
 	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
 
-## stats: generates statistics
+## stats: generates statistics (DOES NOT WORK YET!!!)
 .PHONY: stats
 stats: $(datafile) binning
 	./binning 
@@ -66,7 +74,8 @@ decompress: $(compressed_file)
 .PHONY : variables
 variables:
 	@echo COMPILADOR: $(COMPILADOR)
-	@echo OPTIMITZADOR: $(OPTIMITZADOR)
+	#@echo OPTIMITZADOR: $(OPTIMITZADOR)
+	@echo numproc: $(nuproc)
 	@echo datafile: $(datafile)
 	@echo compressed_file: $(compressed_file)
 	@echo EPSS: $(EPSS)
