@@ -2,7 +2,7 @@
 # MAKEFILE FOR PARALEL
 # !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
 # TO ACCESS IT DO:
-#			qsrh -q iqtc07.q -pe smp 1
+#			qrsh -q iqtc07.q -pe smp 1
 #			module load openmpi/2.0.1_ics-2015.0
 
 COMPILADOR=mpif90
@@ -27,6 +27,16 @@ binning : binning.o
 .PHONY : run
 run: main
 	mpirun -np $(numproc) main<input.txt
+
+## enter_interactive: enters interactive node in iqtc07
+.PHONY : enter_interactive
+enter_interactive: 
+	qrsh -q iqtc07.q -pe smp 1
+
+## load_mpi: load mpi module when in interactive mode
+.PHONY :load_mpi
+load_mpi:
+	module load openmpi/2.0.1_ics-2015.0
 
 ## plot: runs plots from data in datafile and move them (DOES NOT WORK YET!!!)
 .PHONY: plot

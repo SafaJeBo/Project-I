@@ -82,17 +82,17 @@ program main
     L=(real(N,8)/density)**(1.d0/3.d0)
     call do_SCC(N, L, pos, atoms_list ,nprocs, rank, "SCCconf_init.xyz")
 
-    call MPI_BARRIER(MPI_COMM_WORLD,ierror)
-    if (rank.eq.0) then 
-        print *, rank
-        print *, atoms_list
-    end if 
+    ! call MPI_BARRIER(MPI_COMM_WORLD,ierror)
+    ! if (rank.eq.0) then 
+    !     print *, rank
+    !     print *, atoms_list
+    ! end if 
 
-    call MPI_BARRIER(MPI_COMM_WORLD,ierror)
-    if (rank.eq.1) then 
-        print *, rank
-        print *, atoms_list
-    end if 
+    ! call MPI_BARRIER(MPI_COMM_WORLD,ierror)
+    ! if (rank.eq.1) then 
+    !     print *, rank
+    !     print *, atoms_list
+    ! end if 
 
     ! HERE GOES SEPARATION OF PARTICLES BY PROC
     
