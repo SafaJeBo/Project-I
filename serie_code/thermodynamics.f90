@@ -68,12 +68,17 @@ module thermodynamics
     return
     end
 
-    subroutine gr(pos,N,d,numdr,L,rdf)
+    ! ######## CALCULATE g(r) ######## !
+    subroutine gr(pos,N,d,numdr,L,rdf)       
         implicit none
         integer :: N,d,i,j,numdr,x,y,z
-        real(8) :: pos(N,d),deltar,L,rdf(numdr),dx,dy,dz,limit,dxnew,dynew,dznew,drnew
-        limit=1.5d0*L
+        real(8) :: pos(N,d),deltar,L,rdf(numdr),dx,dy,dz,dr,limit
+        
+        ! Set the limits of the g(r) to be half the simulation box and calculate deltar 
+        limit=0.5d0*L
         deltar=limit/numdr
+
+        ! Calculate distance between each pair of particles
         do i=1,N
             do j=i+1,N
                 dx=pos(i,1)-pos(j,1)
@@ -82,18 +87,14 @@ module thermodynamics
                 call pbc(dy,L,dy)
                 dz=pos(i,3)-pos(j,3)
                 call pbc(dz,L,dz)
-                do x=-1,1,1
-                    do y=-1,1,1
-                        do z=-1,1,1
-                            dxnew=dx+x*L; dynew=dy+y*L; dznew=dz+z*L
-                            drnew=dsqrt(dxnew**2+dynew**2+dznew**2)
-                            if (drnew.le.limit) then
-                                rdf(int(drnew/deltar)+1)=rdf(int(drnew/deltar)+1)+1d0
-                            endif
-                        enddo
-                    enddo
-                enddo
-            enddo
+                
+                dr=dsqrt(dx**2+dy**2+dz**2)
+                
+                ! Classify distance by how many deltar it comprises
+                if (dr.le.limit) then
+                    rdf(int(dr/deltar)+1)=rdf(int(dr/deltar)+1)+1d0
+                endif
+             enddo
         enddo
     return
     end

@@ -102,9 +102,9 @@ program main
     
     !Normalització g(r)
     r=0d0
-    deltar=1.5d0*L/numdr
+    deltar=0.5d0*L/numdr
     do i=1,numdr
-        r=(2*i-1)*deltar
+        r=(i-1)*deltar
         volumdr=4d0*pi*((r+deltar/2d0)**3-(r-deltar/2d0)**3)/3d0
         write(16,*)r,rdf(i)/(sum(rdf)*volumdr*density)
     enddo
