@@ -3,8 +3,14 @@ module MOD_INIT
     implicit none
 
 contains
-
+    ! INITIALIZE PARTICLES IN A SIMPLE CUBIC CONFIGURATION
     subroutine do_SCC(Nat, L, r_xyz, nprocs, rank, fileout_scc)
+        ! Nat: number of atoms
+        ! L: size of one side of the simulation box
+        ! r_xyz: OUTPUT, position of the particles
+        ! nprocs: number of processors
+        ! rank: number associated at the current processor
+        ! fileout_scc: name of output file where to print positions
         implicit none
         integer, intent(in) :: Nat, nprocs, rank
         real(8), intent(in) :: L
@@ -51,25 +57,29 @@ contains
 
     end subroutine do_SCC
 
-     subroutine PBC(Nat,L,r_xyz)
-           implicit none
-           integer, intent(in) :: Nat
-           real(16), intent(in) :: L
-           real(16), dimension(Nat,3), intent(inout) :: r_xyz
 
-           integer :: i, j
+    ! APPLY PERIODIC BOUNDARY CONDITIONS ! 
+    subroutine PBC(Nat,L,r_xyz)
+        ! Nat: number of atoms
+        ! L: size of one side of the simulation box
+        ! r_xyz: INPUT & OUTPUT, position of the particles
+        implicit none
+        integer, intent(in) :: Nat
+        real(16), intent(in) :: L
+        real(16), dimension(Nat,3), intent(inout) :: r_xyz
 
-           do i=1,Nat
-               do j=1,3
-                  if (r_xyz(i,j)>L/2.d0) then
-                          r_xyz(i,j) = r_xyz(i,j)-dble(L)
-                  endif
+        integer :: i, j
 
-                  if (r_xyz(i,j)<L/2.d0) then
-                          r_xyz(i,j) = r_xyz(i,j)+dble(L)
-                  endif
-              enddo
-          enddo
+        do i=1,Nat
+            do j=1,3
+                if (r_xyz(i,j)>L/2.d0) then
+                        r_xyz(i,j) = r_xyz(i,j)-dble(L)
+                        
+                else if (r_xyz(i,j)<L/2.d0) then
+                        r_xyz(i,j) = r_xyz(i,j)+dble(L)
+                endif
+            enddo
+        enddo
    end subroutine PBC
 
 
