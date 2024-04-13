@@ -15,7 +15,7 @@ program binning_gestor
 
     ! Open the file
     open(unit=10, file=filename, status='old', action='read', iostat=iunit)
-    !Check the file opened successfully
+    ! Check that the file opened successfully
     if (iunit /= 0) then
         print*, "Error opening file"
         stop
@@ -29,11 +29,11 @@ program binning_gestor
         num_lines = num_lines + 1
     enddo
 
-        ! Close the file
+    ! Close the file
     close(10)
     print*, "Number of lines:", num_lines
 
-    ! read data
+    ! Allocate number of lines
     allocate(times(num_lines))
     allocate(ekin(num_lines))
     allocate(epot(num_lines))
@@ -44,11 +44,13 @@ program binning_gestor
 
     ! Open the file again
     open(unit=10, file=filename, status='old', action='read', iostat=iunit)
-    !Check the file opened successfully
+    ! Check that the file opened successfully
     if (iunit /= 0) then
         print*, "Error opening file"
         stop
     endif
+
+    ! Read the data and store it in arrays
     do ii = 1,num_lines
         read(10, *, iostat=iunit) time, ek, ep, et, t, mm, p
         times(ii)=time
@@ -75,7 +77,12 @@ program binning_gestor
 
 contains
 
+    ! DO BINNING OF DATA !
     subroutine binning(data_arr, num, file_name, file_status)
+        ! data_arr: array containing the data to bin
+        ! num: size of data_arr
+        ! file_name: name of the output file
+        ! file_status: status of the output file. Check for errors opening it
         implicit none
         character(len=*), intent(in) :: file_name
         integer(8), intent(in) :: num
