@@ -2,7 +2,7 @@ COMPILADOR=gfortran
 OPTIMITZADOR=-o
 
 datafile=thermodynamics.dat
-zip_init=mainmods.zip
+compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 
 ## main: generates the main program
@@ -52,15 +52,15 @@ super_clean:
 	rm -f *.dat
 	rm -f *.tar.gz
 
-## compress: compresses all the .f90 files and the Makefile to a ex1.tar.gz file
+## compress: compresses all the .f90 files and the Makefile to a .tar.gz file
 .PHONY : compress
 compress:
-	tar -czvf P1_serie.tar.gz * ../README.md 
+	tar -czvf $(compressed_file) * ../README.md 
 
-## decompress: decompresses zip 
+## decompress: decompresses .tar.gz in current directory 
 .PHONY: decompress
-decompress: $(zip_init)
-	unzip $(zip_init)
+decompress: $(compressed_file)
+	tar -xvzf $(compressed_file)
 
 ## variables: prints the variables used: the compiler and the optimitzator
 .PHONY : variables
@@ -68,7 +68,7 @@ variables:
 	@echo COMPILADOR: $(COMPILADOR)
 	@echo OPTIMITZADOR: $(OPTIMITZADOR)
 	@echo datafile: $(datafile)
-	@echo zip_init: $(zip_init)
+	@echo compressed_file: $(compressed_file)
 	@echo EPSS: $(EPSS)
 	
 ## help: displays this help message
