@@ -57,16 +57,11 @@ program main
     print *, L, cutoff, M, a
     
     call ini_pos_sc(N,a,M,d,pos)
-    write(14,*) pos
     
     !Thermalization
     sigma = sqrt(temp1)
     do i=1,nsim_temp
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
-        write(14,'(A)') trim(adjustl(''))  ! Blank line
-        write(14,'(I0)') N  
-        write(14,'(A)') trim(adjustl(''))  ! Blank line
- 	    write(14,*) pos
     enddo
     print *, "Finished Thermalization"    
 
@@ -90,6 +85,13 @@ program main
                 print*,i
             endif
 
+            ! Write trajectory in file "trajectory.xyz"
+            write(14,'(I5)')N
+            write(14, *) 
+            do j = 1, 125
+                write(14, '(A, 3F12.6)')'A', pos(j, 1), pos(j, 2), pos(j, 3)
+            end do
+            
             ! Mesure RDF after a certain timestep
             if (i.gt.1e3) then
                 call gr(pos,N,d,numdr,L,rdf)
