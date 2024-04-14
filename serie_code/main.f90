@@ -91,8 +91,7 @@ program main
             do j = 1, 125
                 write(14, '(A, 3F12.6)')'A', pos(j, 1), pos(j, 2), pos(j, 3)
             end do
-            write(14,*) " "
-
+            
             ! Mesure RDF after a certain timestep
             if (i.gt.1e3) then
                 call gr(pos,N,d,numdr,L,rdf)
