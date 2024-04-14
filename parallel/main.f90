@@ -4,10 +4,11 @@ program main
     use mpi
 
     use MOD_INIT
+    use integrate
     ! use [integration]
     ! use [force]
     ! use [thermodynamics]
-
+    implicit none
     ! MPI variables
     integer :: ierror, rank, nprocs
 
@@ -67,6 +68,7 @@ program main
     ! open(14,file='trajectory.xyz')
     ! open(15,file='thermodynamics.dat')
     ! open(16,file='resultsrdflong_def.dat')
+    open(20,file='force.dat')
 
     call MPI_BARRIER(MPI_COMM_WORLD,ierror) ! Barrier to start program at the same time
 
@@ -95,17 +97,16 @@ program main
     ! end if 
 
     ! HERE GOES SEPARATION OF PARTICLES BY PROC
-    
+    vel=0d0
     ! !Thermalization
-    ! sigma = sqrt(temp1)
-    ! do i=1,nsim_temp
-    !     call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
+    sigma = sqrt(temp1)
+    do i=1,nsim_temp
+         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
     !     write(14,'(A)') trim(adjustl(''))  ! Blank line
     !     write(14,'(I0)') N  
     !     write(14,'(A)') trim(adjustl(''))  ! Blank line
  	!     write(14,*) pos
-    ! enddo
-    ! print *, "Finished Thermalization"    
+    enddo  
 
 
     ! !Starting production run
@@ -154,4 +155,3 @@ program main
     call MPI_FINALIZE(ierror)
     
     end program main
-    
