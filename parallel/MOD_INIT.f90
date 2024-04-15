@@ -18,7 +18,6 @@ contains
         real(8), intent(in) :: L
         real(8), intent(out) :: r_xyz(Nat,3)
         real(8):: pos(Nat,3)
-        integer:: my_arr(3,3), arr(3,3), transf(2)
         integer :: pos_to_transfer(nprocs),displs(nprocs)
         character(len=*), intent(in) :: fileout_scc
 
@@ -51,9 +50,15 @@ contains
 
         ! Generate an array with all the number of positions that will be sent later
         call MPI_ALLGATHER(atoms_per_proc,1,MPI_INT,pos_to_transfer,1,MPI_INT,MPI_COMM_WORLD, ierror)
-        print *, "I", rank, "have",pos_to_transfer
+
+        ! Calculate displs
+        displs(1) = 0
+        do i = 2, nprocs
+            displs(i) = displs(i-1)+pos_to_transfer(i)
+        end do
+        print *, "I", rank, "have",pos_to_transfer, displs
+
         r_xyz = 0
-        pos = 0
         ! Calculate positions for this proc's atoms
             indx = 0
             do i = 1, nint(Nat ** (1.0d0 / 3.0d0))
@@ -61,64 +66,33 @@ contains
                     do k = 1, nint(Nat ** (1.0d0 / 3.0d0))
                         indx = indx + 1
                         if (indx >= start_atom .and. indx <= end_atom) then ! save only the atoms associated to processor
-                            r_xyz(indx, :) = (/(i - 1) ,(j - 1) ,(k - 1) /)
-                            ! r_xyz(indx, 2) = (j - 1) * a
-                            ! r_xyz(indx, 3) = (k - 1) * a
-                            print*, rank, indx,"---", r_xyz(indx,1),r_xyz(indx,2),r_xyz(indx,3)
+                            r_xyz(indx, :) = (/(i - 1)*a ,(j - 1)*a ,(k - 1)*a /)
                         end if
                     end do
                 end do
             end do
         print *, "I", rank, "finished with my particles", atoms_per_proc
-        ! Synchronize before writing to file
         
+        ! Synchronize before writing to file
 
-        displs = 0
-        if (rank==1) then
-            print *, pos_to_transfer
-            print *, r_xyz
-            print *, "----"
-            print *, r_xyz(125,:)
-            ! do i=1,Nat
-            !     print *, r_xyz(i,:)
-            ! end do
-        end if
-        print*, displs
-
-
-        my_arr = rank+2
-        arr = 5
-        print*, "IIIIIII", rank, my_arr(rank+1,:)
-        transf=(/3,6/)
-        start_atom = rank+1
-        end_atom = rank*2+1
-        call MPI_BARRIER(MPI_COMM_WORLD, ierror)
-        ! call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, :), atoms_per_proc, MPI_REAL8, pos(start_atom:end_atom,:), pos_to_transfer, (/0,186/) ,MPI_REAL8, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(my_arr(start_atom:end_atom,:), transf(rank+1), MPI_INT, arr, transf,(/0,3/) ,MPI_INT, MPI_COMM_WORLD, ierror)
-        ! print *, "I", rank, "have",arr
-        call MPI_BARRIER(MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 1), pos_to_transfer(rank+1), MPI_REAL8,  &
+        r_xyz(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 2), pos_to_transfer(rank+1), MPI_REAL8,  &
+        r_xyz(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 3), pos_to_transfer(rank+1), MPI_REAL8,  &
+        r_xyz(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
 
 
         if (rank == 0) then
-            print *, "iiiiiiiiiiiiiii"
-            print*, arr
-            do i = 1,3
-                do j = 1,3
-                    print*,arr(i,j)
-                enddo
-            enddo
-            print *, "iiiiiiiiiiiiiii"
-
-
-
             open(unit=21, file=fileout_scc, status='replace')
             write(21, *) Nat
             write(21, *) 'Initial SCC configuration'
             do i = 1, Nat
-                write(21, "(a4,3f12.6)") 'Atom', pos(i, 1), pos(i, 2), pos(i, 3) !"(a4,3f12.6)"
+                write(21, "(a4,3f12.6)") 'Atom', r_xyz(i, 1), r_xyz(i, 2), r_xyz(i, 3) !"(a4,3f12.6)"
             end do
             close(21)
         end if
+        return
 
     end subroutine do_SCC
 

@@ -98,16 +98,11 @@ program main
 
     ! HERE GOES SEPARATION OF PARTICLES BY PROC
     vel=0d0
-    ! !Thermalization
+    !Thermalization
     sigma = sqrt(temp1)
     do i=1,nsim_temp
          call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
-    !     write(14,'(A)') trim(adjustl(''))  ! Blank line
-    !     write(14,'(I0)') N  
-    !     write(14,'(A)') trim(adjustl(''))  ! Blank line
- 	!     write(14,*) pos
     enddo  
-
 
     ! !Starting production run
     ! sigma=sqrt(temp2)
