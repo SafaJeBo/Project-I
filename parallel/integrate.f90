@@ -137,7 +137,7 @@ module integrate
         real(8) :: chi1,chi2,pi,var,mean,val
         parameter(pi=4.d0*atan(1.d0))
         call RANDOM_NUMBER(chi1)
-        call random_NUMBER(chi2)
+        call RANDOM_NUMBER(chi2)
         val=var*dsqrt(-2.d0*dlog(1.d0-chi1))*dcos(2.d0*pi*chi2)+mean
     return
     end
