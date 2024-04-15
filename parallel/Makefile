@@ -23,10 +23,30 @@ main : MOD_INIT.o forces.o integrate.o main.o
 binning : binning.o
 	$(COMPILADOR) -o $@ $^
 
-## run: executes the main program
-.PHONY : run
-run: main
-	mpirun -np $(numproc) main<input.txt
+## run#proc: executes the main program (run2, run4, run8, run16, run32, run40)
+.PHONY : run2
+run2: main
+	mpirun -np 2 main<input.txt
+
+.PHONY : run4
+run4: main
+	mpirun -np 4 main<input.txt
+
+.PHONY : run8
+run8: main
+	mpirun -np 8 main<input.txt
+
+.PHONY : run16
+run16: main
+	mpirun -np 16 main<input.txt
+
+.PHONY : run32
+run32: main
+	mpirun -np 32 main<input.txt 
+
+.PHONY : run40
+run40: main
+	mpirun -np 40 main<input.txt
 
 ## enter_interactive: enters interactive node in iqtc07
 .PHONY : enter_interactive
@@ -36,7 +56,7 @@ enter_interactive:
 ## load_mpi: load mpi module when in interactive mode
 .PHONY :load_mpi
 load_mpi:
-	module load openmpi/2.0.1_ics-2015.0
+	module load openmpi/4.1.4_ics-2021.3
 
 ## plot: runs plots from data in datafile and move them (DOES NOT WORK YET!!!)
 .PHONY: plot

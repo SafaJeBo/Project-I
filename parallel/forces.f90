@@ -17,15 +17,19 @@ module forces
         cf2=cutoff*cutoff
         potcut=4.d0*(1.d0/cf2**6-1.d0/cf2**3)
         n_atoms_per_proc = N / size
-        start = rank * n_atoms_per_proc + 1
-        end = min((rank + 1) * n_atoms_per_proc, N)
+        !start = rank * n_atoms_per_proc + 1
+        !end = min((rank + 1) * n_atoms_per_proc, N)
         n_atoms_remaining = mod(N, size)
 
-        if (rank < n_atoms_remaining) then
-            n_atoms_this_proc = n_atoms_per_proc + 1
-        else
-            n_atoms_this_proc = n_atoms_per_proc
-        end if
+    if (rank < n_atoms_remaining) then
+        n_atoms_this_proc = n_atoms_per_proc + 1
+        start = rank * n_atoms_this_proc + 1
+    else
+        n_atoms_this_proc = n_atoms_per_proc
+        start = n_atoms_remaining * (n_atoms_per_proc + 1) + (rank - n_atoms_remaining) * n_atoms_per_proc + 1
+    end if
+
+    end = start + n_atoms_this_proc - 1
         do i=start,end
             do j=1,N
                 if (i.ne.j) then
@@ -49,25 +53,48 @@ module forces
             enddo
         enddo
         local_Upot=local_Upot/2d0
-        allocate(counts(size), displs(size))
+        !allocate(counts(size), displs(size))
 
-        do i = 0, size - 1
-            if (i < n_atoms_remaining) then
-                counts(i + 1) = n_atoms_per_proc + 1
-            else
-                counts(i + 1) = n_atoms_per_proc
-            end if
-        end do
+        !do i = 0, size - 1
+        !    if (i < n_atoms_remaining) then
+        !        counts(i + 1) = n_atoms_per_proc + 1
+        !    else
+        !        counts(i + 1) = n_atoms_per_proc
+        !    end if
+        !end do
 
-        displs(1) = 0
-        do i = 2, size
-            displs(i) = displs(i - 1) + counts(i - 1)
-        end do
-        call MPI_ALLGATHERV(force(start:end,1), counts(rank+1), MPI_DOUBLE_PRECISION, force(:,1), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(force(start:end,2), counts(rank+1), MPI_DOUBLE_PRECISION, force(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(force(start:end,3), counts(rank+1), MPI_DOUBLE_PRECISION, force(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        !displs(1) = 0
+        !do i = 2, size
+        !    displs(i) = displs(i - 1) + counts(i - 1)
+        !end do
+        
+    ! Calculate counts
+    allocate(counts(size))
+    do i = 1, size
+    if (i <= n_atoms_remaining) then
+        counts(i) = (n_atoms_per_proc + 1) 
+    else
+        counts(i) = n_atoms_per_proc 
+    end if
+    end do
+
+    ! Calculate displs
+    allocate(displs(size))
+    displs(1) = 0
+    do i = 2, size
+    if (i <= n_atoms_remaining) then
+        displs(i) = displs(i-1) + (n_atoms_per_proc + 1) 
+    else
+        displs(i) = displs(i-1) + n_atoms_per_proc 
+    end if
+    end do
+        
+        call MPI_ALLGATHERV(force(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, force(:,1), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(force(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, force(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(force(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, force(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
         call MPI_Allreduce(local_Upot,Upot,1,MPI_DOUBLE_PRECISION,MPI_SUM,MPI_COMM_WORLD,ierror)
-        if (rank.eq.1) then
+        
+	if (rank.eq.1) then
             do k=1,N
                 write(20,*)rank,k,force(k,1),force(k,2),force(k,3)
             enddo

@@ -1,13 +1,17 @@
 module integrate
+
     !use mpi
     use forces, only: find_force_LJ
-    use MOD_INIT, only: PBC,pbc2
+    use MOD_INIT, only: PBC
     implicit none
+
     contains
+
     subroutine time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,Upot)
-        
         implicit none
+
         include 'mpif.h'
+
         integer :: N,d,i,rank,size,start,end,k,ierror,n_atoms_per_proc,n_atoms_remaining,n_atoms_this_proc
         integer, allocatable :: displs(:),counts(:)
         !integer :: displs
@@ -18,16 +22,41 @@ module integrate
         call MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierror)
 
         n_atoms_per_proc = N / size
-        start = rank * n_atoms_per_proc + 1
-        end = min((rank + 1) * n_atoms_per_proc, N)
         n_atoms_remaining = mod(N, size)
 
         ! Calculate the number of atoms this process will handle
-        if (rank < n_atoms_remaining) then
-            n_atoms_this_proc = n_atoms_per_proc + 1
-        else
-            n_atoms_this_proc = n_atoms_per_proc
-        end if
+    if (rank < n_atoms_remaining) then
+        n_atoms_this_proc = n_atoms_per_proc + 1
+        start = rank * n_atoms_this_proc + 1
+    else
+        n_atoms_this_proc = n_atoms_per_proc
+        start = n_atoms_remaining * (n_atoms_per_proc + 1) + (rank - n_atoms_remaining) * n_atoms_per_proc + 1
+    end if
+
+    end = start + n_atoms_this_proc - 1
+
+        ! Calculate counts
+    allocate(counts(size))
+    do i = 1, size
+    if (i <= n_atoms_remaining) then
+        counts(i) = (n_atoms_per_proc + 1) 
+    else
+        counts(i) = n_atoms_per_proc 
+    end if
+    end do
+
+    ! Calculate displs
+    allocate(displs(size))
+    displs(1) = 0
+    do i = 2, size
+    if (i <= n_atoms_remaining) then
+        displs(i) = displs(i-1) + (n_atoms_per_proc + 1) 
+    else
+        displs(i) = displs(i-1) + n_atoms_per_proc 
+    end if
+    end do
+
+
 
         call find_force_LJ(pos,N,d,L,force,cutoff,Upot)
         
@@ -41,29 +70,13 @@ module integrate
             vel(i,3)=vel(i,3)+force(i,3)*0.5d0*dt
         enddo
 
-        !print*,'asd1'
         !allocate(displs(size), counts(size))
         !displs=rank*N/size+1
-        allocate(counts(size), displs(size))
+        !allocate(counts(size), displs(size))
 
-        ! Set the counts array
-        do i = 0, size - 1
-            if (i < n_atoms_remaining) then
-                counts(i + 1) = n_atoms_per_proc + 1
-            else
-                counts(i + 1) = n_atoms_per_proc
-            end if
-        end do
-
-        ! Set the displacements array
-        displs(1) = 0
-        do i = 2, size
-            displs(i) = displs(i - 1) + counts(i - 1)
-        end do
-
-        call MPI_Allgatherv(vel(start:end,1), counts(rank+1), MPI_DOUBLE_PRECISION, vel(:,1), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(vel(start:end,2), counts(rank+1), MPI_DOUBLE_PRECISION, vel(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(vel(start:end,3), counts(rank+1), MPI_DOUBLE_PRECISION, vel(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(vel(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,1), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(vel(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(vel(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
 
         !if (rank.eq.0) then
 
@@ -73,9 +86,9 @@ module integrate
             pos(i,1)=dr(1);pos(i,2)=dr(2);pos(i,3)=dr(3)
         enddo
 
-        call MPI_Allgatherv(pos(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,1), n_atoms_this_proc, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(pos(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,2), n_atoms_this_proc, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(pos(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,3), n_atoms_this_proc, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(pos(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,1), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(pos(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(pos(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
 
         if (rank.eq.0) then
             do k=1,N
@@ -92,40 +105,41 @@ module integrate
             vel(i,3)=vel(i,3)+force(i,3)*0.5d0*dt
         enddo
         
-        call MPI_Allgatherv(vel(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,1), n_atoms_this_proc, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(vel(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,2), n_atoms_this_proc, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(vel(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,3), n_atoms_this_proc, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(vel(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,1), counts,  displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(vel(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(vel(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
         
 
-!        call andersen_thermo(vel,N,d,nu,sigma)
+        call andersen_thermo(vel,N,d,nu,sigma)
     return
     end
 
 
 
-!    subroutine andersen_thermo(vel,N,d,nu,sigma)
-!        implicit none
-!        integer :: N,d,i
-!        real(8) :: sigma,vel(N,d),nu
+    subroutine andersen_thermo(vel,N,d,nu,sigma)
+        implicit none
+        integer :: N,d,i
+        real(8) :: sigma,vel(N,d),nu, rand
     
-!        do i=1,N
-!            if (rand().lt.nu) then
-!                call gauss(0d0,sigma,vel(i,1))
-!                call gauss(0d0,sigma,vel(i,2))
-!                call gauss(0d0,sigma,vel(i,3))
-!            endif
-!        enddo
-!    return
-!    end
+        do i=1,N
+	    call RANDOM_NUMBER(rand)
+            if (rand.lt.nu) then
+                call gauss(0d0,sigma,vel(i,1))
+                call gauss(0d0,sigma,vel(i,2))
+                call gauss(0d0,sigma,vel(i,3))
+            endif
+        enddo
+    return
+    end
     
-!    subroutine gauss(mean,var,val)
-!        implicit none
-!        real(8) :: chi1,chi2,pi,var,mean,val
-!        parameter(pi=4.d0*atan(1.d0))
-!        chi1=rand()
-!        chi2=rand()
-!        val=var*dsqrt(-2.d0*dlog(1.d0-chi1))*dcos(2.d0*pi*chi2)+mean
-!    return
-!    end
+    subroutine gauss(mean,var,val)
+        implicit none
+        real(8) :: chi1,chi2,pi,var,mean,val
+        parameter(pi=4.d0*atan(1.d0))
+        call RANDOM_NUMBER(chi1)
+        call RANDOM_NUMBER(chi2)
+        val=var*dsqrt(-2.d0*dlog(1.d0-chi1))*dcos(2.d0*pi*chi2)+mean
+    return
+    end
 
 end module integrate
