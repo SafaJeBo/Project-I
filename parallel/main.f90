@@ -7,7 +7,7 @@ program main
     use integrate
     ! use [integration]
     ! use [force]
-    ! use [thermodynamics]
+    use thermodynamics
     implicit none
     ! MPI variables
     integer :: ierror, rank, nprocs
@@ -19,7 +19,7 @@ program main
     integer, allocatable :: atoms_list(:)
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
-    real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:)
+    real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:)
     character(15) :: dummy
 
     pi=4d0*datan(1d0)
@@ -59,7 +59,7 @@ program main
     call MPI_BCAST(nu, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierror)
 
     ! Allocate variables
-    allocate(pos(N,d))
+    allocate(pos(N,d),force(N,d))
     allocate(vel(N,d))
     allocate(pos0(N,d))
     allocate(rdf(numdr))
@@ -68,7 +68,9 @@ program main
     ! open(14,file='trajectory.xyz')
     ! open(15,file='thermodynamics.dat')
     ! open(16,file='resultsrdflong_def.dat')
-    open(20,file='force.dat')
+    open(20,file='pos.dat')
+    open(21,file='vel.dat')
+    open(22,file='forces.dat')
 
     call MPI_BARRIER(MPI_COMM_WORLD,ierror) ! Barrier to start program at the same time
 
@@ -83,7 +85,6 @@ program main
     ! Initialize system
     L=(real(N,8)/density)**(1.d0/3.d0)
     call do_SCC(N, L, pos, atoms_list ,nprocs, rank, "SCCconf_init.xyz")
-
     ! call MPI_BARRIER(MPI_COMM_WORLD,ierror)
     ! if (rank.eq.0) then 
     !     print *, rank
@@ -101,8 +102,28 @@ program main
     !Thermalization
     sigma = sqrt(temp1)
     do i=1,nsim_temp
-         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
+         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force)
+         !if ((mod(i,10).eq.0).and.(rank.eq.0)) then
+            !print*,'timestep',i,pot
+         !endif
     enddo  
+
+    print*,'Acabat termalitzacio'
+    sigma=dsqrt(temp2)
+    vel=0d0
+    do i=1,nsim_tot
+        call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force)
+        if ((mod(i,100).eq.0).and.(rank.eq.0)) then
+            call kin_energy(vel,N,d,ke)
+            temperatura=temp_inst(ke,N)
+           print*,'timestep',i,pot,ke,pot+ke,temperatura
+           do j=1,N
+                write(20,*)i,j,pos(j,:)
+                write(21,*)i,j,vel(j,:)
+                write(22,*)i,j,force(j,:)
+           enddo
+        endif
+   enddo  
 
     ! !Starting production run
     ! sigma=sqrt(temp2)
