@@ -104,8 +104,8 @@ contains
         ! r_xyz: INPUT & OUTPUT, position of the particles
         implicit none
         integer, intent(in) :: Nat
-        real(16), intent(in) :: L
-        real(16), dimension(Nat,3), intent(inout) :: r_xyz
+        real(8), intent(in) :: L
+        real(8), dimension(Nat,3), intent(inout) :: r_xyz
 
         integer :: i, j
 
@@ -114,7 +114,7 @@ contains
                 if (r_xyz(i,j)>L/2.d0) then
                         r_xyz(i,j) = r_xyz(i,j)-dble(L)
 
-                else if (r_xyz(i,j)<L/2.d0) then
+                else if (r_xyz(i,j)<-L/2.d0) then
                         r_xyz(i,j) = r_xyz(i,j)+dble(L)
                 endif
             enddo

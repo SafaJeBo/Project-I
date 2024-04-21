@@ -1,16 +1,16 @@
 module integrate
 
-    !use mpi
+    use mpi
     use forces, only: find_force_LJ
     use MOD_INIT, only: PBC
     implicit none
 
     contains
 
-    subroutine time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,Upot)
+    subroutine time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,Upot,force)
         implicit none
 
-        include 'mpif.h'
+        !include 'mpif.h'
 
         integer :: N,d,i,rank,size,start,end,k,ierror,n_atoms_per_proc,n_atoms_remaining,n_atoms_this_proc
         integer, allocatable :: displs(:),counts(:)
@@ -36,6 +36,7 @@ module integrate
     end = start + n_atoms_this_proc - 1
 
         ! Calculate counts
+    !print*,'start-end',rank,start,end
     allocate(counts(size))
     do i = 1, size
     if (i <= n_atoms_remaining) then
@@ -90,12 +91,13 @@ module integrate
         call MPI_Allgatherv(pos(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
         call MPI_Allgatherv(pos(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, pos(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
 
-        if (rank.eq.0) then
-            do k=1,N
-                write(21,*)rank,k,pos(k,1),pos(k,2),pos(k,3)
-                write(21,*)rank,k,vel(k,1),vel(k,2),vel(k,3)
-            enddo
-        endif
+        !call MPI_BARRIER(ierror)
+        !if (rank.eq.0) then
+        !    do k=1,N
+        !        write(21,*)rank,k,pos(k,1),pos(k,2),pos(k,3)
+        !        write(21,*)rank,k,vel(k,1),vel(k,2),vel(k,3)
+        !    enddo
+        !endif
 
 
         call find_force_LJ(pos,N,d,L,force,cutoff,Upot)
@@ -108,9 +110,18 @@ module integrate
         call MPI_Allgatherv(vel(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,1), counts,  displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
         call MPI_Allgatherv(vel(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
         call MPI_Allgatherv(vel(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, vel(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        
 
-        call andersen_thermo(vel,N,d,nu,sigma)
+        call MPI_Allgatherv(force(start:end,1), n_atoms_this_proc, MPI_DOUBLE_PRECISION, force(:,1), counts,  displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(force(start:end,2), n_atoms_this_proc, MPI_DOUBLE_PRECISION, force(:,2), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        call MPI_Allgatherv(force(start:end,3), n_atoms_this_proc, MPI_DOUBLE_PRECISION, force(:,3), counts, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
+        
+        !if (mod(iter,100).eq.0) then
+        !    do i=1,N    
+        !        write(22,*)iter,i,force(i,:)
+        !    enddo
+        !endif
+
+        !call andersen_thermo(vel,N,d,nu,sigma)
     return
     end
 
