@@ -1,0 +1,10 @@
+N           125
+nsim_temp   2000
+nsim_tot    2000
+numdr       1000
+dt          0.001d0
+cutoff      4.5d0
+density     0.1d0
+temp1       100
+temp2       1.8452d0
+nu          0.1d0
