@@ -63,7 +63,7 @@ contains
             displs(i) = displs(i-1)+pos_to_transfer(i-1)
         end do
         print *, "I", rank, "have",pos_to_transfer, displs
-
+        print*,rank,'start',start_atom,'end',end_atom
         r_xyz = 0
         ! Calculate positions for this proc's atoms
             indx = 0
@@ -90,13 +90,13 @@ contains
 
 
         if (rank == 0) then
-            open(unit=21, file=fileout_scc, status='replace')
-            write(21, *) Nat
-            write(21, *) 'Initial SCC configuration'
+            open(unit=25, file=fileout_scc, status='replace')
+            write(25, *) Nat
+            write(25, *) 'Initial SCC configuration'
             do i = 1, Nat
-                write(21, "(a4,3f12.6)") 'Atom', r_xyz(i, 1), r_xyz(i, 2), r_xyz(i, 3) !"(a4,3f12.6)"
+                write(25, "(a4,3f12.6)") 'Atom', r_xyz(i, 1), r_xyz(i, 2), r_xyz(i, 3) !"(a4,3f12.6)"
             end do
-            close(21)
+            close(25)
         end if
         return
 
