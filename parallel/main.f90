@@ -5,6 +5,7 @@ program main
 
     use MOD_INIT
     use integrate
+    use binning_gestor
     ! use [integration]
     ! use [force]
     use thermodynamics
@@ -20,6 +21,7 @@ program main
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
     real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:)
+    real(8) , dimension(:) :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
     character(15) :: dummy
 
     pi=4d0*datan(1d0)
@@ -202,8 +204,18 @@ program main
     !             print*,i
     !         endif
 
+             ! Save results in arrays 
+             ekin_arr(i/100) = ke
+             epot_arr(i/100) = pot
+             etot_arr(i/100) = pot+ke
+             temp_arr(i/100) = temperatura
+             msd_arr(i/100) = msdval
+             press_arr(i/100) = press+temperatura*density
+
     !         ! Mesure RDF after a certain timestep
     !         if (i.gt.1e3) then
+                 ! Binning mesures
+                  call binning(ekin_arr, i/100, Epot_nou.f90)
     !             call gr(pos,N,d,numdr,L,rdf)
     !         endif
     !     endif
