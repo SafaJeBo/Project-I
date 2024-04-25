@@ -3,8 +3,8 @@ module binning_gestor
         contains
         subroutine binning(data_arr, num, output_file)
              implicit none 
-             character(len=100), intent(in) :: output_file
-             integer(8), intent(in) :: num
+             character(12), intent(in) :: output_file
+             integer, intent(in) :: num ! number of elements in data_arr
              double precision, dimension(:), intent(in) :: data_arr
              integer(8) :: ii, mm, max_m, block_length, block_num
              double precision :: mean, sigma, variance, mean_median, std_median
@@ -17,7 +17,6 @@ module binning_gestor
              integer :: status(MPI_STATUS_SIZE)
 
              ! MPI initialization
-             call MPI_INIT(ierror)
              call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
              call MPI_COMM_SIZE(MPI_COMM_WORLD, numproc, ierror)
 
@@ -59,8 +58,8 @@ module binning_gestor
                   deallocate(means_arr)
              end if
 
-             print *, 'Mitjana:', med_mean
-             print *, 'Desviació stand:', med_std
+             print *, 'Mean:', med_mean
+             print *, 'Standard deviation:', med_std
 
              call MPI_Gather(mean, 1, MPI_DOUBLE_PRECISION, mean_results, 1, MPI_DOUBLE_PRECISION, &
                 MASTER, MPI_COMM_WORLD, ierror)
@@ -84,7 +83,6 @@ module binning_gestor
                  write(2,*) "The mean value is:",mean_median , "and standard  deviation is:",std_median
              close(2)
         endif
-        call MPI_FINALIZE(ierror)
     return
     end 
 

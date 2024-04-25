@@ -2,14 +2,12 @@
 program main
     ! Using the provided modules
     use mpi
-
     use MOD_INIT
     use integrate
     use binning_gestor
-    ! use [integration]
-    ! use [force]
     use thermodynamics
     implicit none
+
     ! MPI variables
     integer :: ierror, rank, nprocs
 
@@ -21,7 +19,7 @@ program main
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
     real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:)
-    real(8) , dimension(:) :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
+    real(8) , dimension(:), allocatable :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
     character(15) :: dummy
 
     pi=4d0*datan(1d0)
@@ -32,13 +30,8 @@ program main
     call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
     call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierror)
 
-
-
-   ! allocate(pos_to_transfer(nprocs),displs(nprocs)) 
-
-    print *, "Hi! I am", rank
+    ! Read input parameters (only master)
     if (rank.eq.0) then
-        ! Read parameters (only master)
         read(*,*) dummy, N
         read(*,*) dummy, nsim_temp
         read(*,*) dummy, nsim_tot
@@ -69,13 +62,14 @@ program main
     allocate(vel(N,d))
     allocate(pos0(N,d))
     allocate(rdf(numdr))
+    allocate(pos_to_transfer(nprocs),displs(nprocs)) 
+    allocate(ekin_arr(nsim_tot/100), epot_arr(nsim_tot/100), etot_arr(nsim_tot/100), temp_arr(nsim_tot/100), msd_arr(nsim_tot/100), press_arr(nsim_tot/100))
 
     ! ! Opening files to save results
     ! open(14,file='trajectory.xyz')
     ! open(15,file='thermodynamics.dat')
     ! open(16,file='resultsrdflong_def.dat')
     
-
     !open(20,file='pos.dat')
     !open(21,file='vel.dat')
     !open(22,file='forces.dat')
@@ -88,8 +82,7 @@ program main
         write(*,*)timeini
     end if
 
-    allocate(pos_to_transfer(nprocs),displs(nprocs)) 
-    
+    ! *** DISTRIBUTE ATOMS BETWEEN PROCESSORS *** !
     ! Ensure last proc gets any extra atoms 
     n_atoms_remaining = mod(N, nprocs)
         
@@ -104,8 +97,6 @@ program main
         end_atom = start_atom + atoms_per_proc - 1
     end if
 
-    !print *, "Rank-start-app-end", start_atom,atoms_per_proc,end_atom
-
     ! Save indexes in list
     allocate(atoms_list(atoms_per_proc))
     indx = 1
@@ -113,114 +104,69 @@ program main
         atoms_list(indx) = i
         indx = indx + 1
     end do
-    !print*,'beforeallgather'
 
     ! Generate an array with all the number of positions that will be sent later
     call MPI_ALLGATHER(atoms_per_proc,1,MPI_INT,pos_to_transfer,1,MPI_INT,MPI_COMM_WORLD, ierror)
-    !print*,'ididalgather'
-    ! Calculate displs
 
     displs(1) = 0
     do i = 2, nprocs
         displs(i) = displs(i-1)+pos_to_transfer(i-1)
     end do
-    !print*,'thisisdisps'
-    !print *, "I", rank, "have",pos_to_transfer, displs
 
+    ! *** INITIALIZE SYSTEM *** !
     call srand(1)
-
-    ! Initialize system
     L=(real(N,8)/density)**(1.d0/3.d0)
-    call do_SCC(N, L, pos, atoms_list ,nprocs, rank, "SCCconf_init.xyz")
-    !print*,'i',rank,'finished init'
-    ! call MPI_BARRIER(MPI_COMM_WORLD,ierror)
-    ! if (rank.eq.0) then 
-    !     print *, rank
-    !     print *, atoms_list
-    ! end if 
 
-    ! call MPI_BARRIER(MPI_COMM_WORLD,ierror)
-    ! if (rank.eq.1) then 
-    !     print *, rank
-    !     print *, atoms_list
-    ! end if 
-
-    ! HERE GOES SEPARATION OF PARTICLES BY PROC
+    call do_SCC(N, L, pos, atoms_list ,nprocs, rank, "SCCconf_init.xyz",pos_to_transfer,start_atom,end_atom,displs)
     vel=0d0
-    !Thermalization
+
+    ! *** THERMALIZATION *** !
     sigma = sqrt(temp1)
-    print*,'thermalization data'
+    print*,'Thermalization data'
     do i=1,nsim_temp
-         !print*,'enteredverlet'
          call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs)
          if ((mod(i,100).eq.0).and.(rank.eq.0)) then
             call kin_energy(vel,N,d,ke)
             temperatura=temp_inst(ke,N)
-           print*,'timestep',i,pot,ke,pot+ke,temperatura
-    !       do j=1,N
-    !            write(20,*)i,j,pos(j,:)
-    !            write(21,*)i,j,vel(j,:)
-    !            write(22,*)i,j,force(j,:)
-    !       enddo
+            print*,'timestep',i,pot,ke,pot+ke,temperatura
         endif
-!if ((mod(i,10).eq.0).and.(rank.eq.0)) then
-            !print*,'timestep',i,pot
-         !endif
     enddo  
+    print*,'Finished thermalization'
 
-    print*,'Acabat termalitzacio'
+    ! *** PRODUCTION RUN *** !
     sigma=dsqrt(temp2)
     vel=0d0
+    ! pos0=pos
+    ! rdf=0d0
     do i=1,nsim_tot
         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs)
          if ((mod(i,100).eq.0).and.(rank.eq.0)) then
             call kin_energy(vel,N,d,ke)
             temperatura=temp_inst(ke,N)
-           print*,'timestep',i,pot,ke,pot+ke,temperatura
-    !       do j=1,N
-    !            write(20,*)i,j,pos(j,:)
-    !            write(21,*)i,j,vel(j,:)
-    !            write(22,*)i,j,force(j,:)
-    !       enddo
-        endif
-  enddo  
-
-    ! !Starting production run
-    ! sigma=sqrt(temp2)
-    ! pos0=pos
-    ! rdf=0d0
-    
-    ! do i=1,nsim_tot
-    !     call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
-    !     if (mod(i,100).eq.0) then
-    !         ! Mesure energy, pressure and msd
-    !         call kin_energy(vel,N,d,ke)
-    !         call msd(pos,N,d,pos0,L,msdval)
-    !         call pression(pos,N,d,L,cutoff,press)
-    !         temperatura=temp_inst(ke,N)
-    !         write(15,*)i*dt,ke,pot,pot+ke,temperatura,msdval,press+temperatura*density
+            print*,'timestep',i,pot,ke,pot+ke,temperatura
+            
+            ! ! Save results in arrays 
+            ! ekin_arr(i/100) = ke
+            ! epot_arr(i/100) = pot
+            ! etot_arr(i/100) = pot+ke
+            ! temp_arr(i/100) = temperatura
+            ! msd_arr(i/100) = msdval
+            ! press_arr(i/100) = press+temperatura*density
 
     !         if (mod(i,50000).eq.0) then ! Control state of simulation
     !             print*,i
     !         endif
 
-             ! Save results in arrays 
-             ekin_arr(i/100) = ke
-             epot_arr(i/100) = pot
-             etot_arr(i/100) = pot+ke
-             temp_arr(i/100) = temperatura
-             msd_arr(i/100) = msdval
-             press_arr(i/100) = press+temperatura*density
-
     !         ! Mesure RDF after a certain timestep
     !         if (i.gt.1e3) then
                  ! Binning mesures
-                  call binning(ekin_arr, i/100, Epot_nou.f90)
     !             call gr(pos,N,d,numdr,L,rdf)
     !         endif
-    !     endif
-    !     AQUI PRBLY TOCA POSAR UNA BARRERA
-    ! enddo
+        endif
+  enddo  
+
+    ! 
+    ! call binning(ekin_arr, nsim_tot/100, "Ekin_nou.dat")
     
     ! ! Normalization of RDF
     ! r=0d0
