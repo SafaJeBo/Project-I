@@ -14,7 +14,8 @@ compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 
 ## main: generates the main program
-main : MOD_INIT.o forces.o integrate.o thermodynamics.o main.o
+main : MOD_INIT.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
+
 	$(COMPILADOR) -o $@ $^
 
 %.o : %.f90
