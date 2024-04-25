@@ -21,7 +21,7 @@ contains
         integer :: pos_to_transfer(nprocs),displs(nprocs)
         character(len=*), intent(in) :: fileout_scc
 
-        integer :: M,i, j, k, indx, atoms_per_proc, start_atom, end_atom, ierror
+        integer :: M,i, j, k, indx, atoms_per_proc, start_atom, end_atom, ierror, n_atoms_remaining
         real(8) :: a
 
         ! Calculate lattice parameter
@@ -30,15 +30,21 @@ contains
 
         if (rank==0) print *, L, M, a
 
-        ! Determine number of atoms per proc and assign start and end indices
-        atoms_per_proc = Nat / nprocs
-        start_atom = rank * atoms_per_proc + 1
-        end_atom = start_atom + atoms_per_proc - 1
+        ! Ensure last proc gets any extra atoms 
+        n_atoms_remaining = mod(Nat, nprocs)
 
-        if (rank == nprocs - 1) then
-            atoms_per_proc = atoms_per_proc + Nat-end_atom
-            end_atom = Nat  ! Ensure last proc gets any extra atoms    
+        if (rank < n_atoms_remaining) then
+            atoms_per_proc = Nat / nprocs + 1
+            start_atom = rank * atoms_per_proc + 1
+            end_atom = start_atom + atoms_per_proc - 1
+            
+        else
+            atoms_per_proc = Nat / nprocs
+            start_atom = n_atoms_remaining * (atoms_per_proc + 1) + (rank - n_atoms_remaining) * atoms_per_proc + 1
+            end_atom = start_atom + atoms_per_proc - 1
         end if
+
+        ! print *, "Rank-start-app-end", start_atom,atoms_per_proc,end_atom
 
         ! Save indexes in list
         allocate(atoms_list(atoms_per_proc))
@@ -47,17 +53,17 @@ contains
             atoms_list(indx) = i
             indx = indx + 1
         end do
-
+        
         ! Generate an array with all the number of positions that will be sent later
         call MPI_ALLGATHER(atoms_per_proc,1,MPI_INT,pos_to_transfer,1,MPI_INT,MPI_COMM_WORLD, ierror)
 
         ! Calculate displs
         displs(1) = 0
         do i = 2, nprocs
-            displs(i) = displs(i-1)+pos_to_transfer(i)
+            displs(i) = displs(i-1)+pos_to_transfer(i-1)
         end do
         print *, "I", rank, "have",pos_to_transfer, displs
-
+        print*,rank,'start',start_atom,'end',end_atom
         r_xyz = 0
         ! Calculate positions for this proc's atoms
             indx = 0
@@ -84,13 +90,13 @@ contains
 
 
         if (rank == 0) then
-            open(unit=21, file=fileout_scc, status='replace')
-            write(21, *) Nat
-            write(21, *) 'Initial SCC configuration'
+            open(unit=25, file=fileout_scc, status='replace')
+            write(25, *) Nat
+            write(25, *) 'Initial SCC configuration'
             do i = 1, Nat
-                write(21, "(a4,3f12.6)") 'Atom', r_xyz(i, 1), r_xyz(i, 2), r_xyz(i, 3) !"(a4,3f12.6)"
+                write(25, "(a4,3f12.6)") 'Atom', r_xyz(i, 1), r_xyz(i, 2), r_xyz(i, 3) !"(a4,3f12.6)"
             end do
-            close(21)
+            close(25)
         end if
         return
 
@@ -104,8 +110,8 @@ contains
         ! r_xyz: INPUT & OUTPUT, position of the particles
         implicit none
         integer, intent(in) :: Nat
-        real(16), intent(in) :: L
-        real(16), dimension(Nat,3), intent(inout) :: r_xyz
+        real(8), intent(in) :: L
+        real(8), dimension(Nat,3), intent(inout) :: r_xyz
 
         integer :: i, j
 
@@ -114,7 +120,7 @@ contains
                 if (r_xyz(i,j)>L/2.d0) then
                         r_xyz(i,j) = r_xyz(i,j)-dble(L)
 
-                else if (r_xyz(i,j)<L/2.d0) then
+                else if (r_xyz(i,j)<-L/2.d0) then
                         r_xyz(i,j) = r_xyz(i,j)+dble(L)
                 endif
             enddo

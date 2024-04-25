@@ -14,7 +14,8 @@ compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 
 ## main: generates the main program
-main : MOD_INIT.o forces.o integrate.o binning_gestor.o main.o
+main : MOD_INIT.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
+
 	$(COMPILADOR) -o $@ $^
 
 %.o : %.f90
@@ -56,6 +57,7 @@ enter_interactive:
 ## load_mpi: load mpi module when in interactive mode
 .PHONY :load_mpi
 load_mpi:
+	module load intel_compiler_suite/2021.3
 	module load openmpi/4.1.4_ics-2021.3
 
 ## plot: runs plots from data in datafile and move them (DOES NOT WORK YET!!!)
