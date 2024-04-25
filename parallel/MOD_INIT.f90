@@ -4,7 +4,7 @@ module MOD_INIT
 
 contains
     ! INITIALIZE PARTICLES IN A SIMPLE CUBIC CONFIGURATION AND DISTRIBUTE PARTICLES !
-    subroutine do_SCC(Nat, L, r_xyz, atoms_list, nprocs, rank, fileout_scc)
+    subroutine do_SCC(Nat, L, r_xyz, atoms_list, nprocs, rank, fileout_scc,pos_to_transfer,start_atom,end_atom,displs)
         ! Nat: number of atoms
         ! L: size of one side of the simulation box
         ! r_xyz: OUTPUT, position of the particles
@@ -12,6 +12,10 @@ contains
         ! nprocs: number of processors
         ! rank: number associated at the current processor
         ! fileout_scc: name of output file where to print positions
+        ! pos_to_transfer: array with number of data to transfer/receive from each processors in ALLGATHER
+        ! start_atom: first atom index to consider for this processor
+        ! end_atom: last atom index to consider for this processor
+        ! displs: displacement matrix for ALLGATHER
         implicit none
         integer, intent(in) :: Nat, nprocs, rank
         integer, intent(out), allocatable :: atoms_list(:)
@@ -27,44 +31,8 @@ contains
         ! Calculate lattice parameter
         M=int(Nat**(1.d0/3.d0))
         a=L/real(M,8)
-
         if (rank==0) print *, L, M, a
 
-        ! Ensure last proc gets any extra atoms 
-        n_atoms_remaining = mod(Nat, nprocs)
-
-        if (rank < n_atoms_remaining) then
-            atoms_per_proc = Nat / nprocs + 1
-            start_atom = rank * atoms_per_proc + 1
-            end_atom = start_atom + atoms_per_proc - 1
-            
-        else
-            atoms_per_proc = Nat / nprocs
-            start_atom = n_atoms_remaining * (atoms_per_proc + 1) + (rank - n_atoms_remaining) * atoms_per_proc + 1
-            end_atom = start_atom + atoms_per_proc - 1
-        end if
-
-        ! print *, "Rank-start-app-end", start_atom,atoms_per_proc,end_atom
-
-        ! Save indexes in list
-        allocate(atoms_list(atoms_per_proc))
-        indx = 1
-        do i = start_atom, end_atom
-            atoms_list(indx) = i
-            indx = indx + 1
-        end do
-        
-        ! Generate an array with all the number of positions that will be sent later
-        call MPI_ALLGATHER(atoms_per_proc,1,MPI_INT,pos_to_transfer,1,MPI_INT,MPI_COMM_WORLD, ierror)
-
-        ! Calculate displs
-        displs(1) = 0
-        do i = 2, nprocs
-            displs(i) = displs(i-1)+pos_to_transfer(i-1)
-        end do
-        print *, "I", rank, "have",pos_to_transfer, displs
-        print*,rank,'start',start_atom,'end',end_atom
-        r_xyz = 0
         ! Calculate positions for this proc's atoms
             indx = 0
             do i = 1, nint(Nat ** (1.0d0 / 3.0d0))
@@ -77,17 +45,11 @@ contains
                     end do
                 end do
             end do
-        print *, "I", rank, "finished with my particles", atoms_per_proc
         
         ! Synchronize before writing to file
-
-        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 1), pos_to_transfer(rank+1), MPI_REAL8,  &
-        r_xyz(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 2), pos_to_transfer(rank+1), MPI_REAL8,  &
-        r_xyz(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 3), pos_to_transfer(rank+1), MPI_REAL8,  &
-        r_xyz(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-
+        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 1), pos_to_transfer(rank+1), MPI_REAL8,  r_xyz(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 2), pos_to_transfer(rank+1), MPI_REAL8,  r_xyz(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+        call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 3), pos_to_transfer(rank+1), MPI_REAL8,  r_xyz(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
 
         if (rank == 0) then
             open(unit=25, file=fileout_scc, status='replace')
