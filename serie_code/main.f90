@@ -8,18 +8,22 @@ program main
 
     ! variable declaration
     implicit none
-    integer,parameter :: d=3!, N=125,nsim_temp=1000,nsim_tot=1000,numdr=1000
-    integer :: N,nsim_temp,nsim_tot,numdr
+    integer,parameter :: d=3
+    integer :: N,nsim_temp,nsim_tot,numdr,verlet_step
     integer :: M,i,j
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
     real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:)
+    integer,allocatable :: list(:,:),nlist(:)
+    integer :: size_seed, seed
+    integer, allocatable :: seed2(:)
     character(15) :: dummy
     
     ! Read parameters
     read(*,*) dummy, N
     read(*,*) dummy, nsim_temp
     read(*,*) dummy, nsim_tot
+    read(*,*) dummy, verlet_step
     read(*,*) dummy, numdr
     read(*,*) dummy, dt
     read(*,*) dummy, cutoff
@@ -35,6 +39,7 @@ program main
     allocate(vel(N,d))
     allocate(pos0(N,d))
     allocate(rdf(numdr))
+    allocate(list(N,N),nlist(N))
 
     ! Opening files to save results
     open(14,file='trajectory.xyz')
@@ -46,8 +51,14 @@ program main
     call cpu_time(timeini)
     write(*,*)timeini
     
-    call srand(1)
+    !call srand(1)
 
+    !  Initialize random number generator according to system clock (different results each time)  !
+    call random_seed(size=size_seed)
+    allocate (seed2(size_seed))
+    call system_clock(count=seed)
+    seed2 = seed
+    call random_seed(put=seed2)
     
     ! Initialize system
     L=(dble(N)/density)**(1.d0/3.d0)
@@ -60,8 +71,13 @@ program main
     
     !Thermalization
     sigma = sqrt(temp1)
+    call new_vlist(N,d,L,pos,list,nlist,cutoff)
+    vel=0d0
     do i=1,nsim_temp
-        call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
+        if (mod(i,verlet_step).eq.0) then
+            call new_vlist(N,d,L,pos,list,nlist,cutoff)
+        endif
+        call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,list,nlist,nu,sigma,pot)
     enddo
     print *, "Finished Thermalization"    
 
@@ -71,16 +87,22 @@ program main
     pos0=pos
     rdf=0d0
     vel=0d0
+
+    call new_vlist(N,d,L,pos,list,nlist,cutoff)
+
     do i=1,nsim_tot
-        call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
-        if (mod(i,100).eq.0) then
+        if (mod(i,verlet_step).eq.0) then
+            call new_vlist(N,d,L,pos,list,nlist,cutoff)
+        endif
+        call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,list,nlist,nu,sigma,pot)
+        if (mod(i,1000).eq.0) then
             ! Mesure energy, pressure and msd
             call kin_energy(vel,N,d,ke)
             call msd(pos,N,d,pos0,L,msdval)
             call pression(pos,N,d,L,cutoff,press)
             temperatura=temp_inst(ke,N)
             write(15,*)i*dt,ke,pot,pot+ke,temperatura,msdval,press+temperatura*density
-
+            print*,i,ke,pot,pot+ke
             if (mod(i,50000).eq.0) then ! Control state of simulation
                 print*,i
             endif
@@ -111,6 +133,6 @@ program main
     call cpu_time(timefin)
     print*,'FINAL time = ',timefin-timeini
 
-    
+    deallocate(seed2)
     end program main
     

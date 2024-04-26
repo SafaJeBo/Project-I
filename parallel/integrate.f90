@@ -1,13 +1,13 @@
 module integrate
 
     use mpi
-    use forces, only: find_force_LJ
+    use forces, only: find_force_LJ,force_Verlet
     use MOD_INIT, only: PBC
     implicit none
 
     contains
      ! VELOCITY VERLET INTEGRATOR FOR 1 TIMESTEP !
-     subroutine time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,Upot,force,pos_to_transfer,start_atom,end_atom,displs)
+     subroutine time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,Upot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
         ! nprocs: number of processors
         ! pos: INPUT & OUTPUT, positions array 
         ! N: total number of atoms
@@ -26,7 +26,7 @@ module integrate
         ! displs: displacement matrix for ALLGATHER
         implicit none
         integer, intent(in) :: nprocs
-        integer :: Nat, N,d,i,rank,start_atom,end_atom,k,ierror
+        integer :: Nat, N,d,i,rank,start_atom,end_atom,k,ierror, list(N),nlist(N,N)
         integer, dimension(nprocs) :: displs, pos_to_transfer
         real(8) :: pos(N,d),force(N,d),dt,L,cutoff,vel(N,d),nu,sigma,Upot,dr(3)
         real(8),allocatable :: local_velx(:),local_vely(:),local_velz(:),local_posx(:),local_posy(:),local_posz(:)
@@ -34,7 +34,8 @@ module integrate
         call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
 
         ! Calculate forces between particles
-        call find_force_LJ(nprocs,pos,N,d,L,force,cutoff,Upot,pos_to_transfer,start_atom,end_atom,displs)
+        !call find_force_LJ(nprocs,pos,N,d,L,force,cutoff,Upot,pos_to_transfer,start_atom,end_atom,displs)
+        call force_Verlet(nprocs,N,d,L,pos,force,cutoff,Upot,list,nlist,pos_to_transfer,start_atom,end_atom,displs)
         
         ! Calculate positions and velocities for each of the assigned atoms
         do i=start_atom,end_atom
@@ -65,7 +66,8 @@ module integrate
 
 
         ! Calculate forces and second part of velocities
-        call find_force_LJ(nprocs,pos,N,d,L,force,cutoff,Upot,pos_to_transfer,start_atom,end_atom,displs)
+        !call find_force_LJ(nprocs,pos,N,d,L,force,cutoff,Upot,pos_to_transfer,start_atom,end_atom,displs)
+        call force_Verlet(nprocs,N,d,L,pos,force,cutoff,Upot,list,nlist,pos_to_transfer,start_atom,end_atom,displs)
         do i=start_atom,end_atom
             vel(i,1)=vel(i,1)+force(i,1)*0.5d0*dt
             vel(i,2)=vel(i,2)+force(i,2)*0.5d0*dt

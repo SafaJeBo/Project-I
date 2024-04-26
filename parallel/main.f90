@@ -3,6 +3,7 @@ program main
     ! Using the provided modules
     use mpi
     use MOD_INIT
+    use forces
     use integrate
     use binning_gestor
     use thermodynamics
@@ -13,14 +14,14 @@ program main
 
     ! variable declaration
     integer,parameter :: d=3
-    integer :: N,nsim_temp,nsim_tot,numdr
+    integer :: N,nsim_temp,nsim_tot,numdr,verlet_step
     integer :: M,i,j,k, indx, atoms_per_proc, start_atom, end_atom, n_atoms_remaining
-    integer, allocatable :: atoms_list(:), pos_to_transfer(:), displs(:)
+    integer, allocatable :: atoms_list(:), pos_to_transfer(:), displs(:), nlist(:),list(:,:)
     integer :: size_seed, seed
     integer, allocatable :: seed2(:)
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
-    real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:)
+    real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:), local_rdf(:)
     real(8) , dimension(:), allocatable :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
     character(15) :: dummy
 
@@ -37,6 +38,7 @@ program main
         read(*,*) dummy, N
         read(*,*) dummy, nsim_temp
         read(*,*) dummy, nsim_tot
+        read(*,*) dummy, verlet_step
         read(*,*) dummy, numdr
         read(*,*) dummy, dt
         read(*,*) dummy, cutoff
@@ -51,6 +53,7 @@ program main
     call MPI_BCAST(N, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierror)
     call MPI_BCAST(nsim_temp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierror)
     call MPI_BCAST(nsim_tot, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierror)
+    call MPI_BCAST(verlet_step, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierror)
     call MPI_BCAST(numdr, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierror)
     call MPI_BCAST(dt, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierror)
     call MPI_BCAST(cutoff, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierror)
@@ -63,14 +66,19 @@ program main
     allocate(pos(N,d),force(N,d))
     allocate(vel(N,d))
     allocate(pos0(N,d))
-    allocate(rdf(numdr))
+    allocate(rdf(numdr),local_rdf(numdr))
     allocate(pos_to_transfer(nprocs),displs(nprocs)) 
+    allocate(nlist(N),list(N,N))
     allocate(ekin_arr(nsim_tot/100), epot_arr(nsim_tot/100), etot_arr(nsim_tot/100), temp_arr(nsim_tot/100), msd_arr(nsim_tot/100), press_arr(nsim_tot/100))
 
     ! ! Opening files to save results
     ! open(14,file='trajectory.xyz')
-    ! open(15,file='thermodynamics.dat')
-    ! open(16,file='resultsrdflong_def.dat')
+    if (rank.eq.0) then
+        open(15,file='thermo_kin+pot.dat')
+        open(16,file='thermo_tot+msd.dat')
+        open(17,file='thermo_temp+press.dat')
+        open(18,file='results_rdf.dat')
+    endif
     
     !open(20,file='pos.dat')
     !open(21,file='vel.dat')
@@ -116,6 +124,7 @@ program main
     end do
 
     ! *** Initialize random number generator according to system clock (different results each time) *** !
+
     call random_seed(size=size_seed)
     allocate (seed2(size_seed))
     call system_clock(count=seed)
@@ -131,28 +140,40 @@ program main
     ! *** THERMALIZATION *** !
     sigma = sqrt(temp1)
     print*,'Thermalization data'
+    call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
     do i=1,nsim_temp
-         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs)
-         if ((mod(i,100).eq.0).and.(rank.eq.0)) then
-            call kin_energy(vel,N,d,ke)
-            temperatura=temp_inst(ke,N)
-            print*,'timestep',i,pot,ke,pot+ke,temperatura
+        if (mod(i,verlet_step).eq.0) then
+            call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
         endif
+        call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
     enddo  
     print*,'Finished thermalization'
 
     ! *** PRODUCTION RUN *** !
     sigma=dsqrt(temp2)
     vel=0d0
-    ! pos0=pos
-    ! rdf=0d0
+    pos0=pos
+    local_rdf=0d0
+    rdf=0d0
+    call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
     do i=1,nsim_tot
-        call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs)
-         if ((mod(i,100).eq.0).and.(rank.eq.0)) then
-            call kin_energy(vel,N,d,ke)
+        if (mod(i,verlet_step).eq.0) then
+            call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
+        endif
+        call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
+        if ((mod(i,1000).eq.0).and.(rank.eq.0)) then
+            print*,'timestep',i
+        endif
+         if (mod(i,100).eq.0) then
+            call kin_energy(vel,N,d,start_atom,end_atom,ke)
+            call msd(pos,N,d,pos0,L,start_atom,end_atom,msdval)
+            call pression(pos,N,d,L,cutoff,start_atom,end_atom,press)
             temperatura=temp_inst(ke,N)
-            print*,'timestep',i,pot,ke,pot+ke,temperatura
-            
+            if (rank.eq.0) then
+                write(15,*)i*dt,ke,pot
+                write(16,*)i*dt,pot+ke,msdval
+                write(17,*)i*dt,temperatura,press+temperatura*density
+
             ! ! Save results in arrays 
             ! ekin_arr(i/100) = ke
             ! epot_arr(i/100) = pot
@@ -164,30 +185,33 @@ program main
     !         if (mod(i,50000).eq.0) then ! Control state of simulation
     !             print*,i
     !         endif
-
-    !         ! Mesure RDF after a certain timestep
-    !         if (i.gt.1e3) then
-                 ! Binning mesures
-    !             call gr(pos,N,d,numdr,L,rdf)
-    !         endif
+            endif
+        endif
+       ! Mesure RDF after a certain timestep
+        if (i.gt.1e3) then
+            call gr(pos,N,d,numdr,L,start_atom,end_atom,local_rdf)
         endif
   enddo  
 
     ! 
     ! call binning(ekin_arr, nsim_tot/100, "Ekin_nou.dat")
-    
+    call MPI_Allreduce(local_rdf,rdf,numdr,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierror)
+
     ! ! Normalization of RDF
-    ! r=0d0
-    ! deltar=0.5d0*L/numdr
-    ! do i=1,numdr
-    !     r=(i-1)*deltar
-    !     volumdr=4d0*pi*((r+deltar/2d0)**3-(r-deltar/2d0)**3)/3d0
-    !     write(16,*)r,rdf(i)/(sum(rdf)*volumdr*density)
-    ! enddo
+    if (rank.eq.0) then
+        r=0d0
+        deltar=0.5d0*L/numdr
+        do i=1,numdr
+            r=(i-1)*deltar
+            volumdr=4d0*pi*((r+deltar/2d0)**3-(r-deltar/2d0)**3)/3d0
+            write(18,*)r,rdf(i)/(sum(rdf)*volumdr*density)
+        enddo
+    endif
 
     call MPI_BARRIER(MPI_COMM_WORLD,ierror) ! Final barrier to get time
 
-    deallocate(pos_to_transfer,displs,seed2)
+    deallocate(pos_to_transfer,displs)
+    deallocate(seed2)
 
     if (rank.eq.0) then
         call cpu_time(timefin)

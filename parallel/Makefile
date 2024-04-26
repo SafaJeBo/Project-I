@@ -3,19 +3,18 @@
 # !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
 # TO ACCESS IT DO:
 #			qrsh -q iqtc07.q -pe smp 1
-#			module load openmpi/2.0.1_ics-2015.0
+#			module load openmpi/4.1.4_ics-2021.3
 
 COMPILADOR=mpif90
 #OPTIMITZADOR=-O2
 numproc=2
 
-datafile=thermodynamics.dat
+#datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 
 ## main: generates the main program
 main : MOD_INIT.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
-
 	$(COMPILADOR) -o $@ $^
 
 %.o : %.f90
@@ -60,9 +59,10 @@ load_mpi:
 	module load intel_compiler_suite/2021.3
 	module load openmpi/4.1.4_ics-2021.3
 
-## plot: runs plots from data in datafile and move them (DOES NOT WORK YET!!!)
+## plot: runs plots from data in datafile and move them
 .PHONY: plot
-plot: $(datafile)
+#plot: $(datafile)
+plot: 
 	gnuplot data2plots.gnu  
 	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
