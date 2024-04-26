@@ -16,6 +16,8 @@ program main
     integer :: N,nsim_temp,nsim_tot,numdr
     integer :: M,i,j,k, indx, atoms_per_proc, start_atom, end_atom, n_atoms_remaining
     integer, allocatable :: atoms_list(:), pos_to_transfer(:), displs(:)
+    integer :: size_seed, seed
+    integer, allocatable :: seed2(:)
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
     real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:)
@@ -113,8 +115,14 @@ program main
         displs(i) = displs(i-1)+pos_to_transfer(i-1)
     end do
 
+    ! *** Initialize random number generator according to system clock (different results each time) *** !
+    call random_seed(size=size_seed)
+    allocate (seed2(size_seed))
+    call system_clock(count=seed)
+    seed2 = seed
+    call random_seed(put=seed2)
+
     ! *** INITIALIZE SYSTEM *** !
-    call srand(1)
     L=(real(N,8)/density)**(1.d0/3.d0)
 
     call do_SCC(N, L, pos, atoms_list ,nprocs, rank, "SCCconf_init.xyz",pos_to_transfer,start_atom,end_atom,displs)
@@ -179,7 +187,7 @@ program main
 
     call MPI_BARRIER(MPI_COMM_WORLD,ierror) ! Final barrier to get time
 
-    deallocate(pos_to_transfer,displs)
+    deallocate(pos_to_transfer,displs,seed2)
 
     if (rank.eq.0) then
         call cpu_time(timefin)

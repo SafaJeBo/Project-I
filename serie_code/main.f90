@@ -70,7 +70,7 @@ program main
     sigma=sqrt(temp2)
     pos0=pos
     rdf=0d0
-    
+    vel=0d0
     do i=1,nsim_tot
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,nu,sigma,pot)
         if (mod(i,100).eq.0) then
