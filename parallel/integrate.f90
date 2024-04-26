@@ -26,7 +26,7 @@ module integrate
         ! displs: displacement matrix for ALLGATHER
         implicit none
         integer, intent(in) :: nprocs
-        integer :: Nat, N,d,i,rank,start_atom,end_atom,k,ierror,seed(4), list(N),nlist(N,N)
+        integer :: Nat, N,d,i,rank,start_atom,end_atom,k,ierror, list(N),nlist(N,N)
         integer, dimension(nprocs) :: displs, pos_to_transfer
         real(8) :: pos(N,d),force(N,d),dt,L,cutoff,vel(N,d),nu,sigma,Upot,dr(3)
         real(8),allocatable :: local_velx(:),local_vely(:),local_velz(:),local_posx(:),local_posy(:),local_posz(:)
