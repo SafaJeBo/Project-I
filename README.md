@@ -44,16 +44,18 @@ In order to run the program, the user must download the prerequisites listed bel
 ### Usage
 To run the program, type:  
 
-Compiles the modules and generates the main program. Then execute the main program.
 ```
 make main
 make run
 ```
-Generates statiscs file with info on mean and standard deviation of observables. Runs plots from data in datafile and moves them to a new folder.
+Compiles the modules and generates the main program. Then executes the main program.
+
 ```
 make stats
 make plot
 ```
+Generates statiscs file with info on mean and standard deviation of observables. Runs plots from data in datafile and moves them to a new folder.  
+
 For more commands type make help
 
 ###  Program structure
@@ -80,25 +82,28 @@ Additionally, the following files are used for proper functioning:
 ## Parallel Code
 
 ### Usage
-To run the program, type:  
+To run the parallel program, type:  
 
-Enter interactive environment and load required modules.
+
 ```
 make enter_interactive
 module load intel_compiler_suite/2021.3
 module load openmpi/4.1.4_ics-2021.3
 ```
-Compile the modules and generates the main program.  
-Then execute the main program. Replace X with the number of cores you want to use to run the program.
+Enters interactive environment and loads required modules.
+
 ```
 make main
 make runX
 ```
-Generates statiscs file with info on mean and standard deviation of observables. Runs plots from data in datafile and moves them to a new folder.
+Compile the modules and generates the main program.  
+Then execute the main program. Replace X with the number of cores you want to use to run the program.
+
 ```
 make stats
 make plot
 ```
+Generates statiscs file with info on mean and standard deviation of observables. Runs plots from data in datafile and moves them to a new folder.  
 For more commands type make help
 
 ##  Expected Results
