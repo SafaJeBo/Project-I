@@ -123,7 +123,8 @@ program main
         displs(i) = displs(i-1)+pos_to_transfer(i-1)
     end do
 
-    !  Initialize random number generator according to system clock (different results each time)  !
+    ! *** Initialize random number generator according to system clock (different results each time) *** !
+
     call random_seed(size=size_seed)
     allocate (seed2(size_seed))
     call system_clock(count=seed)

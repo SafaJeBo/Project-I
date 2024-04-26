@@ -87,7 +87,9 @@ program main
     pos0=pos
     rdf=0d0
     vel=0d0
+
     call new_vlist(N,d,L,pos,list,nlist,cutoff)
+
     do i=1,nsim_tot
         if (mod(i,verlet_step).eq.0) then
             call new_vlist(N,d,L,pos,list,nlist,cutoff)
