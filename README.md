@@ -16,7 +16,7 @@ Data analysis of the generated data is conducted utilizing gnuplot.
 	2. [Program structure](#program-structure)
 	   1. [Main Program](#main-program)
 	   2. [Modules](#modules)
-3. [Parallel code] (#parallel-code)
+3. [Parallel code](#parallel-code)
 	1. [Usage](#usage)
 4. [Expected Results](#expected-results)
    1. [Justification of the results](#justification-of-the-results)
@@ -48,7 +48,7 @@ To run the program, type:
 make main
 make run
 ```
-Compiles the modules and generates the main program. Then executes the main program.
+Compiles the modules and generates the main program. Then executes the main program.  
 
 ```
 make stats
