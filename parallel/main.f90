@@ -22,7 +22,7 @@ program main
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
     real(8), allocatable :: pos(:,:), vel(:,:), pos0(:,:), rdf(:),force(:,:), local_rdf(:)
-    real(8) , dimension(:), allocatable :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
+    double precision , dimension(:), allocatable :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
     character(15) :: dummy
 
     pi=4d0*datan(1d0)
@@ -69,7 +69,7 @@ program main
     allocate(rdf(numdr),local_rdf(numdr))
     allocate(pos_to_transfer(nprocs),displs(nprocs)) 
     allocate(nlist(N),list(N,N))
-    allocate(ekin_arr(nsim_tot/100), epot_arr(nsim_tot/100), etot_arr(nsim_tot/100), temp_arr(nsim_tot/100), msd_arr(nsim_tot/100), press_arr(nsim_tot/100))
+    allocate(ekin_arr((nsim_tot-1000)/100), epot_arr((nsim_tot-1000)/100), etot_arr((nsim_tot-1000)/100), temp_arr((nsim_tot-1000)/100), msd_arr((nsim_tot-1000)/100), press_arr((nsim_tot-1000)/100))
 
     ! ! Opening files to save results
     ! open(14,file='trajectory.xyz')
@@ -164,7 +164,8 @@ program main
         if ((mod(i,1000).eq.0).and.(rank.eq.0)) then
             print*,'timestep',i
         endif
-         if (mod(i,100).eq.0) then
+         
+        if (mod(i,100).eq.0) then
             call kin_energy(vel,N,d,start_atom,end_atom,ke)
             call msd(pos,N,d,pos0,L,start_atom,end_atom,msdval)
             call pression(pos,N,d,L,cutoff,start_atom,end_atom,press)
@@ -173,28 +174,35 @@ program main
                 write(15,*)i*dt,ke,pot
                 write(16,*)i*dt,pot+ke,msdval
                 write(17,*)i*dt,temperatura,press+temperatura*density
+            endif
 
-            ! ! Save results in arrays 
-            ! ekin_arr(i/100) = ke
-            ! epot_arr(i/100) = pot
-            ! etot_arr(i/100) = pot+ke
-            ! temp_arr(i/100) = temperatura
-            ! msd_arr(i/100) = msdval
-            ! press_arr(i/100) = press+temperatura*density
 
     !         if (mod(i,50000).eq.0) then ! Control state of simulation
     !             print*,i
     !         endif
+            if (i.gt.1e3) then
+                call gr(pos,N,d,numdr,L,start_atom,end_atom,local_rdf)
+                ! Save results in arrays 
+                ekin_arr((i-1000)/100) = dble(ke)
+                epot_arr((i-1000)/100) = dble(pot)
+                etot_arr((i-1000)/100) = dble(pot+ke)
+                temp_arr((i-1000)/100) = dble(temperatura)
+                msd_arr((i-1000)/100) = dble(msdval)
+                press_arr((i-1000)/100) = dble(press+temperatura*density)
             endif
+
         endif
        ! Mesure RDF after a certain timestep
-        if (i.gt.1e3) then
-            call gr(pos,N,d,numdr,L,start_atom,end_atom,local_rdf)
-        endif
+
   enddo  
 
-    ! 
-    ! call binning(ekin_arr, nsim_tot/100, "Ekin_nou.dat")
+    print *, "Gonna bin"
+    call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
+    call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
+    call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
+    call binning(temp_arr, (nsim_tot-1000)/100, "Temp_mean.dat")
+    call binning(msd_arr, (nsim_tot-1000)/100, "MSD_mean.dat")
+    call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat")
     call MPI_Allreduce(local_rdf,rdf,numdr,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierror)
 
     ! ! Normalization of RDF

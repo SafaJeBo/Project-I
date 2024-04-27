@@ -6,19 +6,21 @@ compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 
 ## main: generates the main program
-main : initialize.o forces.o integrate.o thermodynamics.o main.o
+main : initialize.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
 	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
 
 %.o : %.f90
 	$(COMPILADOR) -c $^
 
-binning : binning.o
-	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
+# binning : binning.o
+#	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
 
 ## run: executes the main program
 .PHONY : run
 run: main
+	mkdir -p statistics
 	./main<input.txt
+	mv *_mean.dat statistics
 
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
