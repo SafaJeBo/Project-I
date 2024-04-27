@@ -7,7 +7,7 @@ program main
     use thermodynamics
     use binning_gestor
 
-    ! variable declaration
+    ! Variable declaration
     implicit none
     integer,parameter :: d=3
     integer :: N,nsim_temp,nsim_tot,numdr,verlet_step
@@ -21,7 +21,6 @@ program main
     character(15) :: dummy
     double precision , dimension(:), allocatable :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
 
-    
     ! Read parameters
     read(*,*) dummy, N
     read(*,*) dummy, nsim_temp
@@ -51,33 +50,32 @@ program main
     open(15,file='thermodynamics.dat')
     open(16,file='resultsrdflong_def.dat')
 
-
     ! Getting the initial time to account for total simulation time
     call cpu_time(timeini)
     write(*,*)timeini
-    
-    !call srand(1)
 
-    !  Initialize random number generator according to system clock (different results each time)  !
+    !  Initialize random number generator according to system clock (different results each time)
     call random_seed(size=size_seed)
     allocate (seed2(size_seed))
     call system_clock(count=seed)
     seed2 = seed
     call random_seed(put=seed2)
     
-    ! Initialize system
+    ! *** INITIALIZE SYSTEM *** !
     L=(dble(N)/density)**(1.d0/3.d0)
     M=int(N**(1.d0/3.d0))+1
     a=L/dble(M)
-
     print *, L, cutoff, M, a
     
     call ini_pos_sc(N,a,M,d,pos)
-    
-    !Thermalization
-    sigma = sqrt(temp1)
-    call new_vlist(N,d,L,pos,list,nlist,cutoff)
     vel=0d0
+    
+    
+    ! *** THERMALIZATION *** !
+    sigma = sqrt(temp1)
+    ! Generate Verlet list
+    call new_vlist(N,d,L,pos,list,nlist,cutoff)
+
     do i=1,nsim_temp
         if (mod(i,verlet_step).eq.0) then
             call new_vlist(N,d,L,pos,list,nlist,cutoff)
@@ -87,30 +85,30 @@ program main
     print *, "Finished Thermalization"    
 
 
-    !Starting production run
+    ! *** PRODUCTION RUN *** !
     sigma=sqrt(temp2)
     pos0=pos
     rdf=0d0
     vel=0d0
-
+    ! Generate Verlet list
     call new_vlist(N,d,L,pos,list,nlist,cutoff)
 
     do i=1,nsim_tot
+        ! Update Verlet list
         if (mod(i,verlet_step).eq.0) then
             call new_vlist(N,d,L,pos,list,nlist,cutoff)
         endif
+
+        ! Do velocity-Verlet step
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,list,nlist,nu,sigma,pot)
+
         if (mod(i,100).eq.0) then
-            ! Mesure energy, pressure and msd
+            ! Mesure energy, temperature, pressure and msd
             call kin_energy(vel,N,d,ke)
             call msd(pos,N,d,pos0,L,msdval)
             call pression(pos,N,d,L,cutoff,press)
             temperatura=temp_inst(ke,N)
             write(15,*)i*dt,ke,pot,pot+ke,temperatura,msdval,press+temperatura*density
-            print*,i,ke,pot,pot+ke
-            if (mod(i,50000).eq.0) then ! Control state of simulation
-                print*,i
-            endif
 
             ! Write trajectory in file "trajectory.xyz"
             write(14,'(I5)')N
@@ -119,7 +117,7 @@ program main
                 write(14, '(A, 3F12.6)')'A', pos(j, 1), pos(j, 2), pos(j, 3)
             end do
             
-            ! Mesure RDF after a certain timestep
+            ! Mesure RDF and store binning parameters ommiting first timesteps
             if (i.gt.1e3) then
                 call gr(pos,N,d,numdr,L,rdf)
                 ! Save results in arrays 
@@ -130,10 +128,18 @@ program main
                 msd_arr((i-1000)/100) = dble(msdval)
                 press_arr((i-1000)/100) = dble(press+temperatura*density)
             endif
+
+            ! Control state of simulation
+            if (mod(i,50000).eq.0) then 
+                print*,i
+            endif
+
         endif
     enddo
+
     
-    print *, "Gonna bin"
+    ! *** POST PROCESSING *** !
+    ! Do binning of parameters
     call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
     call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
     call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
@@ -150,9 +156,9 @@ program main
         write(16,*)r,rdf(i)/(sum(rdf)*volumdr*density)
     enddo
     
+    ! Print final time
     call cpu_time(timefin)
     print*,'FINAL time = ',timefin-timeini
 
     deallocate(seed2)
     end program main
-    

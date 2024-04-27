@@ -20,13 +20,16 @@ module thermodynamics
     subroutine kin_energy(vel,N,d,start_atom,end_atom,ene)
         ! vel: array of velocities for each particle and dimension
         ! N: number of particles
-        ! d: nummber of spatial dimensions (3 by default)
+        ! d: nummber of spatial dimensions
+        ! start_atom: first atom index to consider for this processor
+        ! end_atom: last atom index to consider for this processor
         ! ene: OUTPUT, kinetic energy
         implicit none
         integer :: N,d,i,ierror,start_atom,end_atom
         real(8) :: vel(N,d),ene,vel_mod,local_ene
         ene=0d0
         local_ene=0d0
+        ! Calculate Kinetic energy for 
         do i=start_atom,end_atom
             vel_mod=vel(i,1)**2+vel(i,2)**2+vel(i,3)**2
             local_ene=local_ene+0.5d0*vel_mod
@@ -42,6 +45,8 @@ module thermodynamics
         ! d: number of spatial dimmensions
         ! L: size of one side of the simulation box
         ! cutoff: maximum particle distance where there is interaction
+        ! start_atom: first atom index to consider for this processor
+        ! end_atom: last atom index to consider for this processor
         ! press: OUTPUT, pressure of the system
         implicit none
         integer :: N,d,i,j,ierror,start_atom,end_atom
@@ -49,7 +54,7 @@ module thermodynamics
         press=0d0
         local_press=0d0
         cf2=cutoff*cutoff
-        ! Calculate distances between pairs of particles
+        ! Calculate distances between pairs of particles for current processor
         do i=start_atom,end_atom
             do j=1,N
                 if (i.ne.j) then
@@ -60,13 +65,13 @@ module thermodynamics
                     call pbc(N,L,dr)
                     dr2=dr(1)*dr(1)+dr(2)*dr(2)+dr(3)*dr(3)
 
-                ! Calculate pressure for particles that interact
-                if (dr2.lt.cf2) then
-                    dr6=dr2*dr2*dr2
-                    fij=48.d0/(dr6*dr6*dr2)-24.d0/(dr2*dr6)
-                    local_press=local_press+fij*dsqrt(dr2)
+                    ! Calculate pressure for particles that interact
+                    if (dr2.lt.cf2) then
+                        dr6=dr2*dr2*dr2
+                        fij=48.d0/(dr6*dr6*dr2)-24.d0/(dr2*dr6)
+                        local_press=local_press+fij*dsqrt(dr2)
+                    endif
                 endif
-            endif
             enddo
         enddo
         local_press=local_press/2d0
@@ -81,6 +86,8 @@ module thermodynamics
         ! N: number of particles
         ! pos0: position array at time t_{i-1}
         ! L: size of one side of the simulation box
+        ! start_atom: first atom index to consider for this processor
+        ! end_atom: last atom index to consider for this processor
         ! val: OUTPUT, mean squared displacement
         implicit none
         integer :: N,d,i,start_atom,end_atom,ierror
@@ -88,7 +95,7 @@ module thermodynamics
         local_val=0d0
         val=0d0
         
-        ! Calculate squared displacement between 2 consecutive timesteps for all particles
+        ! Calculate squared displacement between 2 consecutive timesteps for current processor's particles
         do i=start_atom,end_atom
             dx=pos(i,1)-pos0(i,1)
             dy=pos(i,2)-pos0(i,2)
@@ -110,6 +117,8 @@ module thermodynamics
         ! d: number of spatial dimensions
         ! numdr: number of bins for rdf
         ! L: size of one side of the simulation box
+        ! start_atom: first atom index to consider for this processor
+        ! end_atom: last atom index to consider for this processor
         ! rdf: OUTPUT, array containing number of particles in each distance bin 
         implicit none
         integer :: N,d,i,j,numdr,x,y,z,start_atom,end_atom,ierror
@@ -119,7 +128,7 @@ module thermodynamics
         limit=0.5d0*L
         deltar=limit/numdr
 
-        ! Calculate distance between each pair of particles
+        ! Calculate distance between each pair of particles of current processor
         do i=start_atom,end_atom
             do j=1,N
                 if (i.ne.j) then
@@ -129,11 +138,11 @@ module thermodynamics
                     drnew(1)=dx; drnew(2)=dy; drnew(3)=dz
                     call pbc(N,L,drnew)
                     dr=dsqrt(drnew(1)*drnew(1)+drnew(2)*drnew(2)+drnew(3)*drnew(3))
-                ! Classify distance by how many deltar it comprises
+                    ! Classify distance by how many deltar it comprises
                     if (dr.le.limit) then
                         local_rdf(int(dr/deltar)+1)=local_rdf(int(dr/deltar)+1)+1d0
                     endif
-            endif
+                endif
             enddo
         enddo
     return
