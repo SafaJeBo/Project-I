@@ -22,14 +22,6 @@ module binning_gestor
              call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
              call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierror)
 
-             ! max block length
-             ! num de block length que hi haura
-              ! -- s'ha de dividir entre processadors
-             ! cada proc calculi els "seus blocks" 
-             ! Cada proc fa un block length diff (loop)
-             ! Allgather i s'ho envien tot 
-             ! Es fa la media (o escriure-ho en el fitxer que toqui) --> després fer el plot
-
              ! Calculate max binning length
              allocate(pos_to_transfer(nprocs))
              allocate(displs(nprocs))
@@ -41,7 +33,7 @@ module binning_gestor
              allocate(std_results(max_m+1))
              
             ! Distribute blocks between processors
-            ! Each proc is gonig to do the binning of X blocks
+            ! Each proc is goning to do the binning of X number of blocks with same length
              n_blocks_remaining = mod(max_m+1, nprocs)
 
              if (rank < n_blocks_remaining) then
