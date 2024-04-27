@@ -64,7 +64,6 @@ module integrate
         call MPI_Allgatherv(pos(start_atom:end_atom,2), pos_to_transfer(rank+1), MPI_REAL8, pos(:,2), pos_to_transfer, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
         call MPI_Allgatherv(pos(start_atom:end_atom,3), pos_to_transfer(rank+1), MPI_REAL8, pos(:,3), pos_to_transfer, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
 
-
         ! Calculate forces and second part of velocities
         !call find_force_LJ(nprocs,pos,N,d,L,force,cutoff,Upot,pos_to_transfer,start_atom,end_atom,displs)
         call force_Verlet(nprocs,N,d,L,pos,force,cutoff,Upot,list,nlist,pos_to_transfer,start_atom,end_atom,displs)

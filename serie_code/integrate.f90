@@ -14,6 +14,8 @@ module integrate
         ! vel: INPUT & OUTPUT, velocity array
         ! dt: size of timestep
         ! cutoff: maximum particle distance where there is interaction
+        ! list: Verlet list. Array with the indexes of the particles within cutoff radius of another 
+        ! nlist: array containing the number of particles within cutoff radius of another
         ! nu: Andersen thermostat's associated probability
         ! sigma: deviation of the temperature
         ! Upot: OUTPUT, potential energy
@@ -21,7 +23,7 @@ module integrate
         integer :: N,d,i,list(N,N),nlist(N)
         real(8) :: pos(N,d),force(N,d),dt,L,cutoff,vel(N,d),nu,sigma,Upot
     
-        ! Calculate force between particles
+        ! Calculate force between particles using Verlet lists
         !call find_force_LJ(pos,N,d,L,force,cutoff,Upot)
         call force_Verlet(N,d,L,pos,force,cutoff,Upot,list,nlist)
         

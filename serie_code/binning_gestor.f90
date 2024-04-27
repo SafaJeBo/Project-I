@@ -20,48 +20,48 @@ implicit none
         ! Calculate max binning length
         max_m = int(log(dble(num)) / log(2.0d0)) ! Max block length
         allocate(binning_mat(max_m+1, 3))
+        
+        ! Start doing binning
+        do mm = 0, max_m ! Iterate over block length
+            block_length = 2**mm
+            block_num = 0
+            allocate(means_arr(ceiling(num/dble(block_length))))
+            ! For each block length
+            ! Store mean of each sub block
+            do ii = 1, num, block_length
+                block_num = block_num + 1
+                if ((ii+block_length-1).gt.num) then
+                    means_arr(block_num) = sum(data_arr(ii:num))/size(data_arr(ii:num))
+                else
+                    means_arr(block_num) = sum(data_arr(ii:ii+block_length-1))/dble(block_length)
+                end if
+            end do
+            ! Calculate mean of means
+            mean = sum(means_arr)/dble(block_num)
 
-        ! Iterate over block length
-        do mm = 0, max_m 
-             block_length = 2**mm
-             block_num = 0
-             allocate(means_arr(ceiling(num/dble(block_length))))
-             ! For each block length
-             ! Store mean of each sub block
-             do ii = 1, num, block_length
-                 block_num = block_num + 1
-                 if ((ii+block_length-1).gt.num) then
-                     means_arr(block_num) = sum(data_arr(ii:num))/size(data_arr(ii:num))
-                 else
-                     means_arr(block_num) = sum(data_arr(ii:ii+block_length-1))/dble(block_length)
-                 end if
-             end do
-             ! Calculate mean of means
-             mean = sum(means_arr)/dble(block_num)
+            ! Calculate standard deviation and correct it
+            variance = 0.
+            do ii = 1, block_num
+                variance = variance + (means_arr(ii)-mean)**2
+            end do
+            sigma = sqrt(variance)/sqrt(dble(block_num)*dble(block_num-1))
 
-             ! Calculate standard deviation and correct it
-             variance = 0.
-             do ii = 1, block_num
-                 variance = variance + (means_arr(ii)-mean)**2
-             end do
-             sigma = sqrt(variance)/sqrt(dble(block_num)*dble(block_num-1))
-
-             ! Store in binning_mat
-             binning_mat(mm+1,1) = block_length
-             binning_mat(mm+1,2) = mean
-             binning_mat(mm+1,3) = sigma
-             deallocate(means_arr)
+            ! Store in binning_mat
+            binning_mat(mm+1,1) = block_length
+            binning_mat(mm+1,2) = mean
+            binning_mat(mm+1,3) = sigma
+            deallocate(means_arr)
         end do
 
-        ! Calculate median of mean and std 
+        ! Calculate median value for mean and std
         med_mean = calculate_median(binning_mat(:,2),max_m+1)
         med_std = calculate_median(binning_mat(:,3),max_m+1)
 
         ! Write a file with results
         open(1, file=file_name, status='replace', iostat=file_status)
         if (file_status /= 0) then
-             print*, "Error opening file for writing"
-             return
+            print*, "Error opening file for writing"
+            return
         endif
 
         write(1,*) "Mean value is:", med_mean, &
@@ -70,7 +70,10 @@ implicit none
         close(1)
     end subroutine binning
 
+    ! CALCULATE MEDIAN OF DATA !
     real function calculate_median(arr, n)
+        ! arr: array with data to calculate median 
+        ! n: length of array
         integer, intent(in) :: n
         double precision, dimension(:), intent(in) :: arr
         real(kind=kind(0.0d0)) :: median

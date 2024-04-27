@@ -71,7 +71,7 @@ program main
     allocate(nlist(N),list(N,N))
     allocate(ekin_arr((nsim_tot-1000)/100), epot_arr((nsim_tot-1000)/100), etot_arr((nsim_tot-1000)/100), temp_arr((nsim_tot-1000)/100), msd_arr((nsim_tot-1000)/100), press_arr((nsim_tot-1000)/100))
 
-    ! ! Opening files to save results
+    ! Opening files to save results
     if (rank.eq.0) then
         open(14,file='trajectory.xyz')
         open(15,file='thermo_kin+pot.dat')
@@ -79,10 +79,6 @@ program main
         open(17,file='thermo_temp+press.dat')
         open(18,file='results_rdf.dat')
     endif
-    
-    !open(20,file='pos.dat')
-    !open(21,file='vel.dat')
-    !open(22,file='forces.dat')
 
     call MPI_BARRIER(MPI_COMM_WORLD,ierror) ! Barrier to start program at the same time
 
@@ -91,6 +87,7 @@ program main
         call cpu_time(timeini)
         write(*,*) 't_0 (s)=', timeini 
     end if
+
 
     ! *** DISTRIBUTE ATOMS BETWEEN PROCESSORS *** !
     ! Ensure last proc gets any extra atoms 
@@ -123,13 +120,13 @@ program main
         displs(i) = displs(i-1)+pos_to_transfer(i-1)
     end do
 
-    ! *** Initialize random number generator according to system clock (different results each time) *** !
-
+    ! Initialize random number generator according to system clock (different results each time)
     call random_seed(size=size_seed)
     allocate (seed2(size_seed))
     call system_clock(count=seed)
     seed2 = seed
     call random_seed(put=seed2)
+
 
     ! *** INITIALIZE SYSTEM *** !
     L=(real(N,8)/density)**(1.d0/3.d0)
@@ -137,10 +134,12 @@ program main
     call do_SCC(N, L, pos, atoms_list ,nprocs, rank, "SCCconf_init.xyz",pos_to_transfer,start_atom,end_atom,displs)
     vel=0d0
 
+
     ! *** THERMALIZATION *** !
     sigma = sqrt(temp1)
-    print*,'Thermalization data'
+    ! Generate Verlet list
     call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
+
     do i=1,nsim_temp
         if (mod(i,verlet_step).eq.0) then
             call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
@@ -155,25 +154,29 @@ program main
                 enddo
         endif
     enddo  
-    print*,'Finished thermalization'
+    if (rank.eq.0) print*,'Finished thermalization'
+
 
     ! *** PRODUCTION RUN *** !
     sigma=dsqrt(temp2)
-    vel=0d0
     pos0=pos
     local_rdf=0d0
     rdf=0d0
+    vel=0d0
+    ! Generate Verlet list
     call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
+
     do i=1,nsim_tot
+        ! Update Verlet list
         if (mod(i,verlet_step).eq.0) then
             call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
         endif
+
+        ! Do velocity Verlet step
         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
-        if ((mod(i,1000).eq.0).and.(rank.eq.0)) then
-            print*,'timestep',i
-        endif
          
         if (mod(i,100).eq.0) then
+            ! Mesure energy, temperature, pressure and msd
             call kin_energy(vel,N,d,start_atom,end_atom,ke)
             call msd(pos,N,d,pos0,L,start_atom,end_atom,msdval)
             call pression(pos,N,d,L,cutoff,start_atom,end_atom,press)
@@ -184,10 +187,9 @@ program main
                 write(17,*)i*dt,temperatura,press+temperatura*density
             endif
 
+            ! Write trajectory 
 
-    !         if (mod(i,50000).eq.0) then ! Control state of simulation
-    !             print*,i
-    !         endif
+            ! Mesure RDF and store binning parameters ommiting first timesteps
             if (i.gt.1e3) then
                 call gr(pos,N,d,numdr,L,start_atom,end_atom,local_rdf)
                 ! Save results in arrays 
@@ -199,12 +201,16 @@ program main
                 press_arr((i-1000)/100) = dble(press+temperatura*density)
             endif
 
+            ! Control state of simulation
+            if (mod(i,50000).eq.0) then 
+                print*,i
+            endif
         endif
-       ! Mesure RDF after a certain timestep
+    enddo  
 
-  enddo  
- 
-    ! *** BINNING *** !
+
+    ! *** POST PROCESSING *** !
+    ! Do binning of parameters
     call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
     call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
     call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
@@ -213,7 +219,7 @@ program main
     call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat")
     call MPI_Allreduce(local_rdf,rdf,numdr,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierror)
 
-    ! ! Normalization of RDF
+    ! Normalization of RDF
     if (rank.eq.0) then
         r=0d0
         deltar=0.5d0*L/numdr
@@ -229,6 +235,7 @@ program main
     deallocate(pos_to_transfer,displs)
     deallocate(seed2)
 
+    ! Print final time
     if (rank.eq.0) then
         call cpu_time(timefin)
         print*,'t_f(s) = ',timefin 
