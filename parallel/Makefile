@@ -1,4 +1,3 @@
-
 # MAKEFILE FOR PARALEL
 # !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
 # TO ACCESS IT DO:
@@ -24,6 +23,10 @@ binning : binning.o
 	$(COMPILADOR) -o $@ $^
 
 ## run#proc: executes the main program (run2, run4, run8, run16, run32, run40)
+.PHONY: ALLRUNS
+ALLRUNS: main ALLRUNS.sh
+	@echo 'This could last a few minutes ...'
+	./ALLRUNS.sh 
 .PHONY : run2
 run2: main
 	mkdir -p statistics
@@ -32,23 +35,33 @@ run2: main
 
 .PHONY : run4
 run4: main
+	mkdir -p statsistics
 	mpirun -np 4 main<input.txt
+	mv *_mean.dat statistics/
 
 .PHONY : run8
 run8: main
+	mkdir -p statsistics
 	mpirun -np 8 main<input.txt
+	mv *_mean.dat statistics/
 
 .PHONY : run16
 run16: main
+	mkdir -p statsistics
 	mpirun -np 16 main<input.txt
+	mv *_mean.dat statistics/
 
 .PHONY : run32
 run32: main
-	mpirun -np 32 main<input.txt 
+	mkdir -p statsistics
+	mpirun -np 32 main<input.txt
+	mv *_mean.dat statistics/	
 
 .PHONY : run40
 run40: main
+	mkdir -p statsistics
 	mpirun -np 40 main<input.txt
+	mv *_mean.dat statistics/
 
 ## enter_interactive: enters interactive node in iqtc07
 .PHONY : enter_interactive
@@ -118,5 +131,6 @@ variables:
 .PHONY : help
 help:
 	@grep '^##' Makefile
+
 
 

@@ -11,8 +11,6 @@ implicit none
         integer, intent(in) :: num
         integer :: file_status
         double precision, dimension(:), intent(in) :: data_arr
-
-        ! Binning code
         integer :: ii, mm, max_m, block_length, block_num
         double precision :: mean, sigma, variance
         double precision, dimension(:,:), allocatable :: binning_mat
@@ -22,7 +20,8 @@ implicit none
         ! Calculate max binning length
         max_m = int(log(dble(num)) / log(2.0d0)) ! Max block length
         allocate(binning_mat(max_m+1, 3))
-
+        
+        ! Start doing binning
         do mm = 0, max_m ! Iterate over block length
             block_length = 2**mm
             block_num = 0
@@ -54,7 +53,7 @@ implicit none
             deallocate(means_arr)
         end do
 
-        ! Print median value for mean and std
+        ! Calculate median value for mean and std
         med_mean = calculate_median(binning_mat(:,2),max_m+1)
         med_std = calculate_median(binning_mat(:,3),max_m+1)
 

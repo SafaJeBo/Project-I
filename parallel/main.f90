@@ -17,7 +17,7 @@ program main
     integer :: N,nsim_temp,nsim_tot,numdr,verlet_step
     integer :: M,i,j,k, indx, atoms_per_proc, start_atom, end_atom, n_atoms_remaining
     integer, allocatable :: atoms_list(:), pos_to_transfer(:), displs(:), nlist(:),list(:,:)
-    integer :: size_seed, seed
+    integer :: size_seed, seed, nproc
     integer, allocatable :: seed2(:)
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
@@ -73,7 +73,7 @@ program main
 
     ! Opening files to save results
     if (rank.eq.0) then
-        ! open(14,file='trajectory.xyz')
+        open(14,file='trajectory.xyz')
         open(15,file='thermo_kin+pot.dat')
         open(16,file='thermo_tot+msd.dat')
         open(17,file='thermo_temp+press.dat')
@@ -85,7 +85,7 @@ program main
     ! Getting the initial time to account for total simulation time
     if (rank.eq.0) then 
         call cpu_time(timeini)
-        write(*,*)timeini
+        write(*,*) 't_0 (s)=', timeini 
     end if
 
 
@@ -145,6 +145,14 @@ program main
             call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
         endif
         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
+        ! *** Write trajectory *** !
+        if (rank.eq.0)then
+                write(14,'(I5)')N
+                write(14,*)
+                do j=1, N
+                    write(14,'(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
+                enddo
+        endif
     enddo  
     if (rank.eq.0) print*,'Finished thermalization'
 
@@ -230,7 +238,8 @@ program main
     ! Print final time
     if (rank.eq.0) then
         call cpu_time(timefin)
-        print*,'FINAL time = ',timefin-timeini
+        print*,'t_f(s) = ',timefin 
+        print*,'t_run(s,', nprocs,'proc) = ',timefin-timeini 
     end if
     ! Finalize MPI
     call MPI_FINALIZE(ierror)

@@ -1,0 +1,739 @@
+make[1]: Entering directory '/home/cmm13/Project-I/parallel'
+mpirun -np 16 main<input.txt
+ I am            0 I finished reading inputs. Going to broadcast
+ t_0 (s)=  2.400000000000000E-002
+ Simulation parameters
+ L=   10.7721734501594      M=           5 a=   2.15443469003188     
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Thermalization data
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ Finished thermalization
+ timestep        1000
+ timestep        2000
+ timestep        3000
+ timestep        4000
+ timestep        5000
+ timestep        6000
+ timestep        7000
+ timestep        8000
+ timestep        9000
+ timestep       10000
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+ Gonna bin
+           0           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           0           0           0
+           0           7           7
+           1           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           1           1           1
+           1           7           7
+           9           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+           5           1           1           1           1           1
+           1           1           0           0           0           0
+ finished sharing
+ Gonna share
+           9           7           6
+           9           7           7
+           0           0           0           0           0
+           3           1           1           1           1           1
+           1           1           0           0           0           0
+ Gonna share
+           5           5           5
+           5           7           7
+ finished sharing
+           0           0           0           0           0
+           6           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+          13           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ finished sharing
+ Gonna share
+           3           3           3
+           3           7           7
+ Gonna share
+          13           7           6
+          13           7           7
+          14           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          14           7           6
+           2           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           2           2           2
+           4           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+           7           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           7           7           6
+           7           7           7
+ Gonna share
+           6           6           6
+           6           7           7
+ finished sharing
+           8           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           8           7           6
+           8           7           7
+          10           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          10           7           6
+          12           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          12           7           6
+          12           7           7
+ finished sharing
+          15           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          15           7           6
+          15           7           7
+ finished sharing
+ finished sharing
+          14           7           7
+ finished sharing
+           2           7           7
+ finished sharing
+ Gonna share
+           4           4           4
+           4           7           7
+ finished sharing
+ finished sharing
+          10           7           7
+ finished sharing
+ finished sharing
+ finished sharing
+ finished sharing
+          11           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          11           7           6
+          11           7           7
+ finished sharing
+          10           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          10           7           6
+          10           7           7
+ finished sharing
+           3           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           3           3           3
+           3           7           7
+ finished sharing
+          15           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          15           7           6
+          15           7           7
+ finished sharing
+           8           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           8           7           6
+           8           7           7
+ finished sharing
+          13           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          13           7           6
+          13           7           7
+ finished sharing
+          12           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          12           7           6
+          12           7           7
+ finished sharing
+          14           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          14           7           6
+          14           7           7
+ finished sharing
+           9           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           9           7           6
+           9           7           7
+ finished sharing
+           5           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           5           5           5
+           5           7           7
+ finished sharing
+           2           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           2           2           2
+           2           7           7
+ finished sharing
+           4           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           4           4           4
+           4           7           7
+ finished sharing
+           6           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           6           6           6
+           6           7           7
+ finished sharing
+           0           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           0           0           0
+           0           7           7
+ finished sharing
+           1           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           1           1           1
+           1           7           7
+ finished sharing
+           7           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           7           7           6
+           7           7           7
+ finished sharing
+          11           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          11           7           6
+          11           7           7
+ finished sharing
+           7           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           7           7           6
+           7           7           7
+ finished sharing
+          10           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          10           7           6
+          10           7           7
+ finished sharing
+           3           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           3           3           3
+           3           7           7
+ finished sharing
+          15           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          15           7           6
+          15           7           7
+ finished sharing
+           8           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           8           7           6
+           8           7           7
+ finished sharing
+          13           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          13           7           6
+          13           7           7
+ finished sharing
+          12           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          12           7           6
+          12           7           7
+ finished sharing
+          14           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          14           7           6
+          14           7           7
+ finished sharing
+           9           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           9           7           6
+           9           7           7
+ finished sharing
+           5           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           5           5           5
+           5           7           7
+ finished sharing
+           2           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           2           2           2
+           2           7           7
+ finished sharing
+           4           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           4           4           4
+           4           7           7
+ finished sharing
+           6           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           6           6           6
+           6           7           7
+ finished sharing
+           0           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           0           0           0
+           0           7           7
+ finished sharing
+           1           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           1           1           1
+           1           7           7
+ finished sharing
+          11           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          11           7           6
+          11           7           7
+ finished sharing
+           1           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           1           1           1
+           1           7           7
+ finished sharing
+           7           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           7           7           6
+           7           7           7
+ finished sharing
+          10           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          10           7           6
+          10           7           7
+ finished sharing
+           3           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           3           3           3
+           3           7           7
+ finished sharing
+          15           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          15           7           6
+          15           7           7
+ finished sharing
+           8           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           8           7           6
+           8           7           7
+ finished sharing
+          13           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          13           7           6
+          13           7           7
+ finished sharing
+          12           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          12           7           6
+          12           7           7
+ finished sharing
+          14           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          14           7           6
+          14           7           7
+ finished sharing
+           9           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           9           7           6
+           9           7           7
+ finished sharing
+           5           1           1           1           1           1
+           2           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           2           2           2
+           2           7           7
+ finished sharing
+           4           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           4           4           4
+           4           7           7
+ finished sharing
+           6           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           6           6           6
+           6           7           7
+ finished sharing
+           0           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           0           0           0
+           0           7           7
+          11           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          11           7           6
+          11           7           7
+ finished sharing
+ finished sharing
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           5           5           5
+           5           7           7
+ finished sharing
+          11           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          11           7           6
+          11           7           7
+ finished sharing
+           1           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           1           1           1
+           1           7           7
+ finished sharing
+           7           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           7           7           6
+           7           7           7
+ finished sharing
+          10           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          10           7           6
+          10           7           7
+ finished sharing
+           3           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           3           3           3
+           3           7           7
+ finished sharing
+          15           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          15           7           6
+          15           7           7
+ finished sharing
+           8           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           8           7           6
+           8           7           7
+ finished sharing
+          13           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          13           7           6
+          13           7           7
+ finished sharing
+          12           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          12           7           6
+          12           7           7
+ finished sharing
+          14           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          14           7           6
+          14           7           7
+ finished sharing
+           9           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           9           7           6
+           9           7           7
+ finished sharing
+           0           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           0           0           0
+           0           7           7
+ finished sharing
+           2           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           2           2           2
+           2           7           7
+ finished sharing
+           4           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           4           4           4
+           4           7           7
+ finished sharing
+           6           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           6           6           6
+           6           7           7
+ finished sharing
+           5           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           5           5           5
+           5           7           7
+ finished sharing
+           6           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           6           6           6
+           6           7           7
+ finished sharing
+          11           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          11           7           6
+          11           7           7
+ finished sharing
+           1           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           1           1           1
+           1           7           7
+ finished sharing
+           7           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           7           7           6
+           7           7           7
+ finished sharing
+          10           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          10           7           6
+          10           7           7
+ finished sharing
+           3           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           3           3           3
+           3           7           7
+ finished sharing
+          15           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          15           7           6
+          15           7           7
+ finished sharing
+           8           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           8           7           6
+           8           7           7
+ finished sharing
+          13           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          13           7           6
+          13           7           7
+ finished sharing
+          12           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          12           7           6
+          12           7           7
+ finished sharing
+          14           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+          14           7           6
+          14           7           7
+ finished sharing
+           9           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           9           7           6
+           9           7           7
+ finished sharing
+           0           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           0           0           0
+           0           7           7
+ finished sharing
+           2           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           2           2           2
+           2           7           7
+ finished sharing
+           4           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           4           4           4
+           4           7           7
+ finished sharing
+           5           1           1           1           1           1
+           1           1           0           0           0           0
+           0           0           0           0           0
+ Gonna share
+           5           5           5
+           5           7           7
+ finished sharing
+ t_f(s) =    7.64000000000000     
+ t_run(s,          16 proc) =    7.61600000000000     
+make[1]: Leaving directory '/home/cmm13/Project-I/parallel'
