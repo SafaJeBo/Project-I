@@ -72,8 +72,8 @@ program main
     allocate(ekin_arr((nsim_tot-1000)/100), epot_arr((nsim_tot-1000)/100), etot_arr((nsim_tot-1000)/100), temp_arr((nsim_tot-1000)/100), msd_arr((nsim_tot-1000)/100), press_arr((nsim_tot-1000)/100))
 
     ! ! Opening files to save results
-    ! open(14,file='trajectory.xyz')
     if (rank.eq.0) then
+        open(14,file='trajectory.xyz')
         open(15,file='thermo_kin+pot.dat')
         open(16,file='thermo_tot+msd.dat')
         open(17,file='thermo_temp+press.dat')
@@ -146,6 +146,14 @@ program main
             call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
         endif
         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
+        ! *** Write trajectory *** !
+        if (rank.eq.0)then
+                write(14,'(I5)')N
+                write(14,*)
+                do j=1, N
+                    write(14,'(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
+                enddo
+        endif
     enddo  
     print*,'Finished thermalization'
 
@@ -195,8 +203,8 @@ program main
        ! Mesure RDF after a certain timestep
 
   enddo  
-
-    print *, "Gonna bin"
+ 
+    ! *** BINNING *** !
     call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
     call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
     call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")

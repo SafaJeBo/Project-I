@@ -35,23 +35,33 @@ run2: main
 
 .PHONY : run4
 run4: main
+	mkdir -p statsistics
 	mpirun -np 4 main<input.txt
+	mv *_mean.dat statistics/
 
 .PHONY : run8
 run8: main
+	mkdir -p statsistics
 	mpirun -np 8 main<input.txt
+	mv *_mean.dat statistics/
 
 .PHONY : run16
 run16: main
+	mkdir -p statsistics
 	mpirun -np 16 main<input.txt
+	mv *_mean.dat statistics/
 
 .PHONY : run32
 run32: main
-	mpirun -np 32 main<input.txt 
+	mkdir -p statsistics
+	mpirun -np 32 main<input.txt
+	mv *_mean.dat statistics/	
 
 .PHONY : run40
 run40: main
+	mkdir -p statsistics
 	mpirun -np 40 main<input.txt
+	mv *_mean.dat statistics/
 
 ## enter_interactive: enters interactive node in iqtc07
 .PHONY : enter_interactive
