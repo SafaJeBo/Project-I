@@ -38,25 +38,25 @@ run4: main
 
 .PHONY : run8
 run8: main
-        mkdir -p statsistics
+	mkdir -p statsistics
 	mpirun -np 8 main<input.txt
 	mv *_mean.dat statistics/
 
 .PHONY : run16
 run16: main
-        mkdir -p statsistics
+	mkdir -p statsistics
 	mpirun -np 16 main<input.txt
 	mv *_mean.dat statistics/
 
 .PHONY : run32
 run32: main
-        mkdir -p statsistics
+	mkdir -p statsistics
 	mpirun -np 32 main<input.txt
-        mv *_mean.dat statistics/	
+	mv *_mean.dat statistics/	
 
 .PHONY : run40
 run40: main
-        mkdir -p statsistics
+	mkdir -p statsistics
 	mpirun -np 40 main<input.txt
 	mv *_mean.dat statistics/
 

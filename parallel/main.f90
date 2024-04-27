@@ -146,6 +146,14 @@ program main
             call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
         endif
         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
+        ! *** Write trajectory *** !
+        if (rank.eq.0)then
+                write(14,'(I5)')N
+                write(14,*)
+                do j=1, N
+                    write(14,'(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
+                enddo
+        endif
     enddo  
     print*,'Finished thermalization'
 
@@ -171,11 +179,6 @@ program main
             call pression(pos,N,d,L,cutoff,start_atom,end_atom,press)
             temperatura=temp_inst(ke,N)
             if (rank.eq.0) then
-                write(14,'(I5)')N
-                write(14,*)
-                do j = 1,N
-                    write(14, '(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
-                end do
                 write(15,*)i*dt,ke,pot
                 write(16,*)i*dt,pot+ke,msdval
                 write(17,*)i*dt,temperatura,press+temperatura*density
@@ -200,8 +203,8 @@ program main
        ! Mesure RDF after a certain timestep
 
   enddo  
-
-    print *, "Gonna bin"
+ 
+    ! *** BINNING *** !
     call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
     call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
     call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
