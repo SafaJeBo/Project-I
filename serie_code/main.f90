@@ -5,6 +5,7 @@ program main
     use forces
     use integrate
     use thermodynamics
+    use binning_gestor
 
     ! variable declaration
     implicit none
@@ -18,6 +19,8 @@ program main
     integer :: size_seed, seed
     integer, allocatable :: seed2(:)
     character(15) :: dummy
+    double precision , dimension(:), allocatable :: ekin_arr, epot_arr, etot_arr, temp_arr, msd_arr, press_arr
+
     
     ! Read parameters
     read(*,*) dummy, N
@@ -40,7 +43,9 @@ program main
     allocate(pos0(N,d))
     allocate(rdf(numdr))
     allocate(list(N,N),nlist(N))
-
+    allocate(ekin_arr((nsim_tot-1000)/100), epot_arr((nsim_tot-1000)/100), etot_arr((nsim_tot-1000)/100))
+    allocate(temp_arr((nsim_tot-1000)/100), msd_arr((nsim_tot-1000)/100), press_arr((nsim_tot-1000)/100))
+    
     ! Opening files to save results
     open(14,file='trajectory.xyz')
     open(15,file='thermodynamics.dat')
@@ -95,7 +100,7 @@ program main
             call new_vlist(N,d,L,pos,list,nlist,cutoff)
         endif
         call time_step_vVerlet(pos,N,d,L,vel,dt,cutoff,list,nlist,nu,sigma,pot)
-        if (mod(i,1000).eq.0) then
+        if (mod(i,100).eq.0) then
             ! Mesure energy, pressure and msd
             call kin_energy(vel,N,d,ke)
             call msd(pos,N,d,pos0,L,msdval)
@@ -117,10 +122,25 @@ program main
             ! Mesure RDF after a certain timestep
             if (i.gt.1e3) then
                 call gr(pos,N,d,numdr,L,rdf)
+                ! Save results in arrays 
+                ekin_arr((i-1000)/100) = dble(ke)
+                epot_arr((i-1000)/100) = dble(pot)
+                etot_arr((i-1000)/100) = dble(pot+ke)
+                temp_arr((i-1000)/100) = dble(temperatura)
+                msd_arr((i-1000)/100) = dble(msdval)
+                press_arr((i-1000)/100) = dble(press+temperatura*density)
             endif
         endif
     enddo
     
+    print *, "Gonna bin"
+    call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
+    call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
+    call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
+    call binning(temp_arr, (nsim_tot-1000)/100, "Temp_mean.dat")
+    call binning(msd_arr, (nsim_tot-1000)/100, "MSD_mean.dat")
+    call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat")
+
     ! Normalization of RDF
     r=0d0
     deltar=0.5d0*L/numdr
