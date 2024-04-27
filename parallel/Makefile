@@ -1,3 +1,4 @@
+
 # MAKEFILE FOR PARALEL
 # !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
 # TO ACCESS IT DO:
@@ -11,7 +12,7 @@ numproc=2
 #datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
-
+datafile=$(wildcard thermo_*.dat)
 ## main: generates the main program
 main : MOD_INIT.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
 	$(COMPILADOR) -o $@ $^
@@ -27,6 +28,7 @@ binning : binning.o
 ALLRUNS: main ALLRUNS.sh
 	@echo 'This could last a few minutes ...'
 	./ALLRUNS.sh 
+
 .PHONY : run2
 run2: main
 	mkdir -p statistics
@@ -35,33 +37,23 @@ run2: main
 
 .PHONY : run4
 run4: main
-	mkdir -p statsistics
 	mpirun -np 4 main<input.txt
-	mv *_mean.dat statistics/
 
 .PHONY : run8
 run8: main
-	mkdir -p statsistics
 	mpirun -np 8 main<input.txt
-	mv *_mean.dat statistics/
 
 .PHONY : run16
 run16: main
-	mkdir -p statsistics
 	mpirun -np 16 main<input.txt
-	mv *_mean.dat statistics/
 
 .PHONY : run32
 run32: main
-	mkdir -p statsistics
-	mpirun -np 32 main<input.txt
-	mv *_mean.dat statistics/	
+	mpirun -np 32 main<input.txt 
 
 .PHONY : run40
 run40: main
-	mkdir -p statsistics
 	mpirun -np 40 main<input.txt
-	mv *_mean.dat statistics/
 
 ## enter_interactive: enters interactive node in iqtc07
 .PHONY : enter_interactive
@@ -76,8 +68,7 @@ load_mpi:
 
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
-#plot: $(datafile)
-plot: 
+plot: $(datafile) data2plots.gnu data2plots_adSI.gnu
 	gnuplot data2plots.gnu  
 	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 

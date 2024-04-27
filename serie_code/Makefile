@@ -16,11 +16,13 @@ main : initialize.o forces.o integrate.o thermodynamics.o binning_gestor.o main.
 #	$(COMPILADOR) $(OPTIMITZADOR) -o $@ $^
 
 ## run: executes the main program
-.PHONY : run
+.PHONY : run 
 run: main
 	mkdir -p statistics
-	./main<input.txt
+	./main < input.txt > SERIE.dat
 	mv *_mean.dat statistics
+	tail -n 1 SERIE.dat > ../parallel/timeSERIE.dat
+
 
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
