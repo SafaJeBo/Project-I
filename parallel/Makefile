@@ -1,4 +1,3 @@
-
 # MAKEFILE FOR PARALEL
 # !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
 # TO ACCESS IT DO:
@@ -24,6 +23,10 @@ binning : binning.o
 	$(COMPILADOR) -o $@ $^
 
 ## run#proc: executes the main program (run2, run4, run8, run16, run32, run40)
+.PHONY: ALLRUNS
+ALLRUNS: main ALLRUNS.sh
+	@echo 'This could last a few minutes ...'
+	./ALLRUNS.sh 
 .PHONY : run2
 run2: main
 	mkdir -p statistics
@@ -118,5 +121,6 @@ variables:
 .PHONY : help
 help:
 	@grep '^##' Makefile
+
 
 
