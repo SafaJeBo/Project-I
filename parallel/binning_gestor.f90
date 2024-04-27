@@ -2,6 +2,7 @@ module binning_gestor
     implicit none
         contains
         subroutine binning(data_arr, num, output_file)
+        
              implicit none 
              character(len=*), intent(in) :: output_file
              integer, intent(in) :: num ! number of elements in data_arr
@@ -10,7 +11,6 @@ module binning_gestor
              double precision :: mean, sigma, variance, mean_median, std_median
              double precision, dimension(:), allocatable :: means_arr, mean_results, std_results, my_data
              double precision, dimension(:,:), allocatable :: binning_mat
-             !double precision :: med_mean, med_std
              integer, dimension(:), allocatable :: pos_to_transfer, displs
              integer :: file_status, ierror, comm, rank, nprocs, n_blocks_remaining, blocks_per_proc, end_block, start_block
              integer, parameter :: MASTER = 0
@@ -41,6 +41,7 @@ module binning_gestor
              allocate(std_results(max_m+1))
              
             ! Distribute blocks between processors
+            ! Each proc is gonig to do the binning of X blocks
              n_blocks_remaining = mod(max_m+1, nprocs)
 
              if (rank < n_blocks_remaining) then
@@ -53,12 +54,12 @@ module binning_gestor
                  end_block = start_block + blocks_per_proc - 1
              end if
 
-             ! pos to tranfer = [2,2,1,1]
+            ! pos to tranfer contains number of blocks for proc (ex. pos_to_transfer = [2,2,1,1])
             ! Generate an array with all the number of positions that will be sent later
             call MPI_ALLGATHER(blocks_per_proc,1,MPI_INT,pos_to_transfer,1,MPI_INT,MPI_COMM_WORLD, ierror)
 
             print *, rank, pos_to_transfer
-            ! displs = [0,2,4,5] 
+            ! displs counts space in pos_to_transfer array to avoid overlapping (ex. displs = [0,2,4,5]) 
             displs(1) = 0
             do i = 2, nprocs
                 displs(i) = displs(i-1)+pos_to_transfer(i-1)
@@ -91,28 +92,19 @@ module binning_gestor
                 sigma = sqrt(variance)/sqrt(dble(block_num)*dble(block_num-1))
    
                 ! Store in binning_mat
-                ! binning_mat(mm+1,1) = block_length
                 binning_mat(mm+1,1) = mean
                 binning_mat(mm+1,2) = sigma
                 deallocate(means_arr)
            end do
 
-           print *, "Gonna share"
            ! Share results to master
-           print *, rank, start_block,end_block
-           print *, rank, size(mean_results), sum(pos_to_transfer)  
            call MPI_Gatherv(binning_mat(start_block+1:end_block+1,1), pos_to_transfer(rank+1), MPI_DOUBLE_PRECISION, mean_results, pos_to_transfer,displs, MPI_DOUBLE_PRECISION, &
            MASTER, MPI_COMM_WORLD, ierror)
 
            call MPI_Gatherv(binning_mat(start_block+1:end_block+1,2), pos_to_transfer(rank+1), MPI_DOUBLE_PRECISION, std_results, pos_to_transfer,displs, MPI_DOUBLE_PRECISION, &
            MASTER, MPI_COMM_WORLD, ierror)
-
-           print *, "finished sharing"
-
-            !  print *, 'Mean:', med_mean
-            !  print *, 'Standard deviation:', med_std
         
-        ! Calculate median
+        ! Calculate median of mean and std
         mean_median = calculate_median(mean_results, max_m+1)
         std_median = calculate_median(std_results, max_m+1)
 
