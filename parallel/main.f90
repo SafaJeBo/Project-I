@@ -72,8 +72,8 @@ program main
     allocate(ekin_arr((nsim_tot-1000)/100), epot_arr((nsim_tot-1000)/100), etot_arr((nsim_tot-1000)/100), temp_arr((nsim_tot-1000)/100), msd_arr((nsim_tot-1000)/100), press_arr((nsim_tot-1000)/100))
 
     ! ! Opening files to save results
-    ! open(14,file='trajectory.xyz')
     if (rank.eq.0) then
+        open(14,file='trajectory.xyz')
         open(15,file='thermo_kin+pot.dat')
         open(16,file='thermo_tot+msd.dat')
         open(17,file='thermo_temp+press.dat')
@@ -171,6 +171,11 @@ program main
             call pression(pos,N,d,L,cutoff,start_atom,end_atom,press)
             temperatura=temp_inst(ke,N)
             if (rank.eq.0) then
+                write(14,'(I5)')N
+                write(14,*)
+                do j = 1,N
+                    write(14, '(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
+                end do
                 write(15,*)i*dt,ke,pot
                 write(16,*)i*dt,pot+ke,msdval
                 write(17,*)i*dt,temperatura,press+temperatura*density
