@@ -2,7 +2,9 @@ module binning_gestor
     implicit none
         contains
         subroutine binning(data_arr, num, output_file)
-        
+        ! data_arr: array containing the data to bin
+        ! num: size of data_arr
+        ! file_name: name of the output file
              implicit none 
              character(len=*), intent(in) :: output_file
              integer, intent(in) :: num ! number of elements in data_arr
