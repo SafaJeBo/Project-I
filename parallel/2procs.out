@@ -1,0 +1,87 @@
+make[1]: Entering directory '/home/cmm13/Project-I/parallel'
+mkdir -p statistics
+mpirun -np 2 main<input.txt
+ I am            0 I finished reading inputs. Going to broadcast
+ t_0 (s)=  1.600000000000000E-002
+ Simulation parameters
+ L=   10.7721734501594      M=           5 a=   2.15443469003188     
+ Thermalization data
+ Thermalization data
+ Finished thermalization
+ Finished thermalization
+ timestep        1000
+ timestep        2000
+ timestep        3000
+ timestep        4000
+ timestep        5000
+ timestep        6000
+ timestep        7000
+ timestep        8000
+ timestep        9000
+ timestep       10000
+ Gonna bin
+ Gonna bin
+           0           4           3
+           1           4           3
+ Gonna share
+           0           0           3
+ Gonna share
+           1           4           6
+           0           7           7
+           1           7           7
+ finished sharing
+ finished sharing
+           0           4           3
+ Gonna share
+           0           0           3
+           0           7           7
+ finished sharing
+           1           4           3
+ Gonna share
+           1           4           6
+           1           7           7
+ finished sharing
+           0           4           3
+ Gonna share
+           0           0           3
+           0           7           7
+ finished sharing
+           1           4           3
+ Gonna share
+           1           4           6
+           1           7           7
+ finished sharing
+           0           4           3
+ Gonna share
+           0           0           3
+           0           7           7
+ finished sharing
+           1           4           3
+ Gonna share
+           1           4           6
+           1           7           7
+ finished sharing
+           0           4           3
+ Gonna share
+           0           0           3
+           1           4           3
+ Gonna share
+           1           4           6
+           1           7           7
+ finished sharing
+           0           7           7
+ finished sharing
+           1           4           3
+ Gonna share
+           1           4           6
+           1           7           7
+ finished sharing
+           0           4           3
+ Gonna share
+           0           0           3
+           0           7           7
+ finished sharing
+ t_f(s) =    45.9920000000000     
+ t_run(s,           2 proc) =    45.9760000000000     
+mv *_mean.dat statistics/ 
+make[1]: Leaving directory '/home/cmm13/Project-I/parallel'

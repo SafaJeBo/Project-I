@@ -17,7 +17,7 @@ program main
     integer :: N,nsim_temp,nsim_tot,numdr,verlet_step
     integer :: M,i,j,k, indx, atoms_per_proc, start_atom, end_atom, n_atoms_remaining
     integer, allocatable :: atoms_list(:), pos_to_transfer(:), displs(:), nlist(:),list(:,:)
-    integer :: size_seed, seed
+    integer :: size_seed, seed, nproc
     integer, allocatable :: seed2(:)
     real(8) :: density,L,a,dt,cutoff,temp1,temp2,nu,sigma,temperatura,ke,pot
     real(8) :: timeini,timefin,msdval,r,deltar,volumdr,pi,press
@@ -89,7 +89,7 @@ program main
     ! Getting the initial time to account for total simulation time
     if (rank.eq.0) then 
         call cpu_time(timeini)
-        write(*,*)timeini
+        write(*,*) 't_0 (s)=', timeini 
     end if
 
     ! *** DISTRIBUTE ATOMS BETWEEN PROCESSORS *** !
@@ -223,7 +223,8 @@ program main
 
     if (rank.eq.0) then
         call cpu_time(timefin)
-        print*,'FINAL time = ',timefin-timeini
+        print*,'t_f(s) = ',timefin 
+        print*,'t_run(s,', nprocs,'proc) = ',timefin-timeini 
     end if
     ! Finalize MPI
     call MPI_FINALIZE(ierror)

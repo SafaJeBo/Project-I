@@ -31,7 +31,8 @@ contains
         ! Calculate lattice parameter
         M=int(Nat**(1.d0/3.d0))
         a=L/real(M,8)
-        if (rank==0) print *, L, M, a
+        if (rank==0) print *, 'Simulation parameters'
+        if (rank==0) print *, 'L=', L,'M=', M, 'a=', a 
 
         ! Calculate positions for this proc's atoms
             indx = 0
@@ -52,7 +53,7 @@ contains
         call MPI_ALLGATHERV(r_xyz(start_atom:end_atom, 3), pos_to_transfer(rank+1), MPI_REAL8,  r_xyz(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
 
         if (rank == 0) then
-            open(unit=25, file=fileout_scc, status='replace')
+            open(unit=25, file=fileout_scc, action='write', status='replace')
             write(25, *) Nat
             write(25, *) 'Initial SCC configuration'
             do i = 1, Nat
