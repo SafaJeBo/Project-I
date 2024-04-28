@@ -37,6 +37,7 @@ plot: $(datafile)
 	mv *.xyz trajectories
 	mkdir -p simulation_data
 	mv *.dat simulation_data
+	make super_clean
 
 ## stats: generates statistics
 .PHONY: stats
