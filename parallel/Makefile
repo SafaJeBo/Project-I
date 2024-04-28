@@ -60,21 +60,19 @@ run40: main
 enter_interactive: 
 	qrsh -q iqtc07.q -pe smp 1
 
-## load_mpi: load mpi module when in interactive mode
-.PHONY :load_mpi
-load_mpi:
-	module load intel_compiler_suite/2021.3
-	module load openmpi/4.1.4_ics-2021.3
-
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
-plot: $(datafile) data2plots.gnu data2plots_adSI.gnu
-	gnuplot data2plots.gnu  
+plot: $(datafile) 
+	gnuplot .data2plots.gnu  
 	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
-	gnuplot data2plots_adSI.gnu 
+	gnuplot .data2plots_adSI.gnu 
 	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
+
+.PHONY: plots_paralel
+plots_paralel: 
+	python3 .Analysis_prl.py
 
 ## stats: generates statistics (DOES NOT WORK YET!!!)
 .PHONY: stats
