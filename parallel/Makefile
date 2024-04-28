@@ -33,7 +33,8 @@ ALLRUNS: main ALLRUNS.sh
 run2: main
 	mkdir -p statistics
 	mpirun -np 2 main<input.txt
-	mv *_mean.dat statistics/ 
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/	
 
 .PHONY : run4
 run4: main
@@ -49,11 +50,17 @@ run16: main
 
 .PHONY : run32
 run32: main
-	mpirun -np 32 main<input.txt 
+	mkdir -p statistics
+	mpirun -np 32 main<input.txt
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/	
 
 .PHONY : run40
 run40: main
+	mkdir -p statistics
 	mpirun -np 40 main<input.txt
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/
 
 ## enter_interactive: enters interactive node in iqtc07
 .PHONY : enter_interactive

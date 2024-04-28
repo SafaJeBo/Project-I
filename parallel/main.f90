@@ -145,14 +145,6 @@ program main
             call new_vlist(nprocs,N,d,L,pos,list,nlist,cutoff,pos_to_transfer,start_atom,end_atom)
         endif
         call time_step_vVerlet(nprocs,pos,N,d,L,vel,dt,cutoff,nu,sigma,pot,force,pos_to_transfer,start_atom,end_atom,displs,list,nlist)
-        ! *** Write trajectory *** !
-        if (rank.eq.0)then
-                write(14,'(I5)')N
-                write(14,*)
-                do j=1, N
-                    write(14,'(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
-                enddo
-        endif
     enddo  
     if (rank.eq.0) print*,'Finished thermalization'
 
@@ -185,6 +177,12 @@ program main
                 write(15,*)i*dt,ke,pot
                 write(16,*)i*dt,pot+ke,msdval
                 write(17,*)i*dt,temperatura,press+temperatura*density
+                ! Write Trajectroy 
+                write(14,'(I5)')N
+                write(14,*)
+                do j = 1, N
+                    write(14, '(A, 3F12.6)')'A', pos(j,1), pos(j,2), pos(j,3)
+                enddo
             endif
 
             ! Write trajectory 
@@ -211,12 +209,13 @@ program main
 
     ! *** POST PROCESSING *** !
     ! Do binning of parameters
-    call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
-    call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
-    call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
-    call binning(temp_arr, (nsim_tot-1000)/100, "Temp_mean.dat")
-    call binning(msd_arr, (nsim_tot-1000)/100, "MSD_mean.dat")
-    call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat")
+    call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat", "Ekin_block.dat")
+    call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat", "Epot_block.dat")
+    call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat", "Etot_block.dat")
+    call binning(temp_arr, (nsim_tot-1000)/100, "Temp_mean.dat", "Temp_block.dat")
+    call binning(msd_arr, (nsim_tot-1000)/100, "MSD_mean.dat", "MSD_block.dat")
+    call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat","Press_block.dat")
+    if (rank.eq.0) print*,'Finished Binning'
     call MPI_Allreduce(local_rdf,rdf,numdr,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierror)
 
     ! Normalization of RDF
