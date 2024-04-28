@@ -140,12 +140,12 @@ program main
     
     ! *** POST PROCESSING *** !
     ! Do binning of parameters
-    call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat")
-    call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat")
-    call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat")
-    call binning(temp_arr, (nsim_tot-1000)/100, "Temp_mean.dat")
-    call binning(msd_arr, (nsim_tot-1000)/100, "MSD_mean.dat")
-    call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat")
+    call binning(ekin_arr, (nsim_tot-1000)/100, "Ekin_mean.dat", "Ekin_block.dat")
+    call binning(epot_arr, (nsim_tot-1000)/100, "Epot_mean.dat", "Epot_block.dat")
+    call binning(etot_arr, (nsim_tot-1000)/100, "Etot_mean.dat", "Etot_block.dat")
+    call binning(temp_arr, (nsim_tot-1000)/100, "Temp_mean.dat", "Temp_block.dat")
+    call binning(msd_arr, (nsim_tot-1000)/100, "MSD_mean.dat", "MSD_block.dat")
+    call binning(press_arr, (nsim_tot-1000)/100, "Press_mean.dat", "Press_block.dat")
 
     ! Normalization of RDF
     r=0d0
