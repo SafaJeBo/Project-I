@@ -54,9 +54,9 @@ implicit none
             sigma = sqrt(variance)/sqrt(dble(block_num)*dble(block_num-1))
 
             ! Store in binning_mat
-         !   binning_mat(mm+1,1) = block_length
-         !   binning_mat(mm+1,2) = mean
-         !   binning_mat(mm+1,3) = sigma
+            binning_mat(mm+1,1) = block_length
+            binning_mat(mm+1,2) = mean
+            binning_mat(mm+1,3) = sigma
             write(3,*)block_length, mean, sigma
 
             deallocate(means_arr)
@@ -75,10 +75,6 @@ implicit none
 
         write(1,*) "Mean value is:", med_mean, &
                                 " and standard deviation is:", med_std
-
-       ! write(1,*) "Stored block length:", binning_mat(:,1)
-       ! write(1,*) "Stored mean:", binning_mat(:,2)
-       ! write(1,*) "Stored average:", binning_mat(:,3)       
         close(1)
     end subroutine binning
 
