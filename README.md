@@ -87,8 +87,7 @@ To run the parallel program, type:
 
 ```
 make enter_interactive
-module load intel_compiler_suite/2021.3
-module load openmpi/4.1.4_ics-2021.3
+./.load.sh
 ```
 Enters interactive environment and loads required modules.
 
