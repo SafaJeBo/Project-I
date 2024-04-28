@@ -22,7 +22,6 @@ run: main
 	./main < input.txt > SERIE.dat
 	mv *_mean.dat statistics
 	mv *_block.dat statistics
-	tail -n 1 SERIE.dat > ../parallel/timeSERIE.dat
 
 
 ## plot: runs plots from data in datafile and move them
@@ -34,6 +33,10 @@ plot: $(datafile)
 	gnuplot data2plots_adSI.gnu 
 	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
+	mkdir -p trajectories
+	mv *.xyz trajectories
+	mkdir -p simulation_data
+	mv *.dat simulation_data
 
 ## stats: generates statistics
 .PHONY: stats
