@@ -51,10 +51,9 @@ make run
 Compiles the modules and generates the main program. Then executes the main program.  
 
 ```
-make stats
 make plot
 ```
-Generates statiscs file with info on mean and standard deviation of observables. Runs plots from data in datafile and moves them to a new folder.  
+Runs plots from data in datafile and performs some folder organization.  
 
 For more commands type make help
 
@@ -77,7 +76,7 @@ Additionally, the following files are used for proper functioning:
 - input.txt: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
 - data2plots.gnu: Generates figures from the data generated in the simulation.  
 - data2plots_adSI.gnu: Generates figures in SI units.  
-- binning.f90: Performs block average method and calculates the mean and standard deviation of observables.
+- binning_gestor.f90: Performs block average method and calculates the mean and standard deviation of observables.
 
 ## Parallel Code
 
@@ -86,23 +85,18 @@ To run the parallel program, type:
 
 
 ```
-make enter_interactive
-./.load.sh
+make cluster_compile
+make cluster_ALLRUN
 ```
-Enters interactive environment and loads required modules.
+Compile the modules and generates the main program.  Then executes the main program.
+
 
 ```
-make main
-make runX
-```
-Compile the modules and generates the main program.  
-Then execute the main program. Replace X with the number of cores you want to use to run the program.
-
-```
-make stats
 make plot
+make paralel_plot
 ```
-Generates statiscs file with info on mean and standard deviation of observables. Runs plots from data in datafile and moves them to a new folder.  
+Runs plots from data in datafile and moves them to a new folder. Organizes directory in folders.
+ 
 For more commands type make help
 
 ##  Expected Results
