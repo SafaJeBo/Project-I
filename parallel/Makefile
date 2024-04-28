@@ -25,9 +25,9 @@ binning : binning.o
 
 ## run#proc: executes the main program (run2, run4, run8, run16, run32, run40)
 .PHONY: ALLRUNS
-ALLRUNS: main ALLRUNS.sh
+ALLRUNS: main .ALLRUNS.sh
 	@echo 'This could last a few minutes ...'
-	./ALLRUNS.sh 
+	./.ALLRUNS.sh 
 
 .PHONY : run2
 run2: main
