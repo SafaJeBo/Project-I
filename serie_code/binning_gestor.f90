@@ -2,12 +2,12 @@ module binning_gestor
 implicit none
     contains
     ! DO BINNING OF DATA !
-    subroutine binning(data_arr, num, file_name)
+    subroutine binning(data_arr, num, file_name, file_name_block)
         ! data_arr: array containing the data to bin
         ! num: size of data_arr
         ! file_name: name of the output file
         implicit none
-        character(len=*), intent(in) :: file_name
+        character(len=*), intent(in) :: file_name, file_name_block
         integer, intent(in) :: num
         integer :: file_status
         double precision, dimension(:), intent(in) :: data_arr
@@ -20,7 +20,14 @@ implicit none
         ! Calculate max binning length
         max_m = int(log(dble(num)) / log(2.0d0)) ! Max block length
         allocate(binning_mat(max_m+1, 3))
-        
+
+        open(3, file=file_name_block, iostat=file_status)
+        if (file_status /= 0) then
+                print*,"Error opening file for writing"
+                return
+        endif
+        write(3,*)'Block length         Mean              Average'
+
         ! Start doing binning
         do mm = 0, max_m ! Iterate over block length
             block_length = 2**mm
@@ -47,12 +54,14 @@ implicit none
             sigma = sqrt(variance)/sqrt(dble(block_num)*dble(block_num-1))
 
             ! Store in binning_mat
-            binning_mat(mm+1,1) = block_length
-            binning_mat(mm+1,2) = mean
-            binning_mat(mm+1,3) = sigma
+         !   binning_mat(mm+1,1) = block_length
+         !   binning_mat(mm+1,2) = mean
+         !   binning_mat(mm+1,3) = sigma
+            write(3,*)block_length, mean, sigma
+
             deallocate(means_arr)
         end do
-
+        close(3)
         ! Calculate median value for mean and std
         med_mean = calculate_median(binning_mat(:,2),max_m+1)
         med_std = calculate_median(binning_mat(:,3),max_m+1)
@@ -67,6 +76,9 @@ implicit none
         write(1,*) "Mean value is:", med_mean, &
                                 " and standard deviation is:", med_std
 
+       ! write(1,*) "Stored block length:", binning_mat(:,1)
+       ! write(1,*) "Stored mean:", binning_mat(:,2)
+       ! write(1,*) "Stored average:", binning_mat(:,3)       
         close(1)
     end subroutine binning
 
