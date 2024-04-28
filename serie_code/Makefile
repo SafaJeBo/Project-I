@@ -21,6 +21,7 @@ run: main
 	mkdir -p statistics
 	./main < input.txt > SERIE.dat
 	mv *_mean.dat statistics
+	mv *_block.dat statistics
 	tail -n 1 SERIE.dat > ../parallel/timeSERIE.dat
 
 
