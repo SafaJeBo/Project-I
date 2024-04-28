@@ -112,7 +112,7 @@ module binning_gestor
                      print*, "Error opening file for writing"
                      stop  
                 endif 
-                write(3,*) "Block length                 Mean                  Average"
+                write(3,*) "Block length                 Mean                  Sigma"
                 do i = 1, max_m+1
                      write(3,*) block_results(i), mean_results(i), std_results(i)
                 enddo

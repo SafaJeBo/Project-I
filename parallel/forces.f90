@@ -57,9 +57,9 @@ module forces
         
         ! Distribute forces to all processors and sum all the potential energies on MASTER processor
         local_Upot=local_Upot/2d0
-        call MPI_ALLGATHERV(force(start_atom:end_atom,1), pos_to_transfer(rank+1), MPI_REAL8, force(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(force(start_atom:end_atom,2), pos_to_transfer(rank+1), MPI_REAL8, force(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-        call MPI_ALLGATHERV(force(start_atom:end_atom,3), pos_to_transfer(rank+1), MPI_REAL8, force(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+       !call MPI_ALLGATHERV(force(start_atom:end_atom,1), pos_to_transfer(rank+1), MPI_REAL8, force(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+       !call MPI_ALLGATHERV(force(start_atom:end_atom,2), pos_to_transfer(rank+1), MPI_REAL8, force(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+       !call MPI_ALLGATHERV(force(start_atom:end_atom,3), pos_to_transfer(rank+1), MPI_REAL8, force(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
         call MPI_Allreduce(local_Upot,Upot,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierror)
         
     return
@@ -168,9 +168,9 @@ module forces
             
             ! Distribute forces to all processors and sum all the potential energies on MASTER processor
             local_Upot=local_Upot/2d0
-            call MPI_ALLGATHERV(force(start_atom:end_atom,1), pos_to_transfer(rank+1), MPI_REAL8, force(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-            call MPI_ALLGATHERV(force(start_atom:end_atom,2), pos_to_transfer(rank+1), MPI_REAL8, force(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
-            call MPI_ALLGATHERV(force(start_atom:end_atom,3), pos_to_transfer(rank+1), MPI_REAL8, force(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+         !  call MPI_ALLGATHERV(force(start_atom:end_atom,1), pos_to_transfer(rank+1), MPI_REAL8, force(:,1), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+         !  call MPI_ALLGATHERV(force(start_atom:end_atom,2), pos_to_transfer(rank+1), MPI_REAL8, force(:,2), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
+         !  call MPI_ALLGATHERV(force(start_atom:end_atom,3), pos_to_transfer(rank+1), MPI_REAL8, force(:,3), pos_to_transfer, displs, MPI_REAL8, MPI_COMM_WORLD, ierror)
             call MPI_Allreduce(local_Upot,Upot,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierror)
         return
         end

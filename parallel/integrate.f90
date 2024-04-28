@@ -47,11 +47,6 @@ module integrate
             vel(i,3)=vel(i,3)+force(i,3)*0.5d0*dt
         enddo
 
-        ! Distribute velocities between processors
-        call MPI_Allgatherv(vel(start_atom:end_atom,1), pos_to_transfer(rank+1), MPI_REAL8, vel(:,1), pos_to_transfer, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(vel(start_atom:end_atom,2), pos_to_transfer(rank+1), MPI_REAL8, vel(:,2), pos_to_transfer, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-        call MPI_Allgatherv(vel(start_atom:end_atom,3), pos_to_transfer(rank+1), MPI_REAL8, vel(:,3), pos_to_transfer, displs, MPI_DOUBLE_PRECISION, MPI_COMM_WORLD, ierror)
-
         ! Apply PBC to atomic positions before distributing
         do i=start_atom,end_atom
             dr(1)=pos(i,1); dr(2)=pos(i,2);dr(3)=pos(i,3)

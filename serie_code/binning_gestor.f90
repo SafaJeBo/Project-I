@@ -26,7 +26,7 @@ implicit none
                 print*,"Error opening file for writing"
                 return
         endif
-        write(3,*)'Block length         Mean              Average'
+        write(3,*)'Block length         Mean              Sigma'
 
         ! Start doing binning
         do mm = 0, max_m ! Iterate over block length

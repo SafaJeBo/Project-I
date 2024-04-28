@@ -20,40 +20,87 @@ main : MOD_INIT.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
 %.o : %.f90
 	$(COMPILADOR) -c $^
 
-binning : binning.o
-	$(COMPILADOR) -o $@ $^
+## interactive_ALLRUN: runs code with all number of processors in interactive
+.PHONY : interactive_ALLRUN
+interactive_ALLRUN:
+	make run1 > 1procs.out
+	@echo "Finished 1"
+	make run2 > 2procs.out
+	@echo "Finished 2"
+	make run4 > 4procs.out
+	@echo "Finished 4"
+	make run8 > 8procs.out
+	@echo "Finished 8"
+	make run16 > 16procs.out
+	@echo "Finished 16"
+	make run32 > 32procs.out
+	@echo "Finished 32"
+	make run40 > 40procs.out
+	@echo "Finished 40"
 
-## run#proc: executes the main program (run2, run4, run8, run16, run32, run40)
-.PHONY: ALLRUNS
-ALLRUNS: main .ALLRUNS.sh
-	@echo 'This could last a few minutes ...'
-	./.ALLRUNS.sh 
+## cluster_ALLRUN: runs code with all number of processors in cluster
+.PHONY : cluster_ALLRUN
+cluster_ALLRUN:
+	rm -f 1procs.out   # Avoid overlaping
+	qsub -pe smp 1 -o "1procs.out" submit07_runner.sub
+	rm -f 2procs.out   # Avoid overlaping
+	qsub -pe smp 2 -o "2procs.out" submit07_runner.sub
+	rm -f 4procs.out   # Avoid overlaping
+	qsub -pe smp 4 -o "4procs.out" submit07_runner.sub
+	rm -f 8procs.out   # Avoid overlaping
+	qsub -pe smp 8 -o "8procs.out" submit07_runner.sub
+	rm -f 16procs.out   # Avoid overlaping
+	qsub -pe smp 16 -o "16procs.out" submit07_runner.sub
+	rm -f 32procs.out   # Avoid overlaping
+	qsub -pe smp 32 -o "32procs.out" submit07_runner.sub
+	rm -f 40procs.out   # Avoid overlaping
+	qsub -pe smp 40 -o "40procs.out" submit07_runner.sub
+
+## cluster_compile: compile modules in cluster
+.PHONY: cluster_compile
+cluster_compile:
+	qsub submit07_compiler.sub
+
+.PHONY : run1
+run1: main
+	mkdir -p statistics
+	mpirun -np 1 main<input.txt
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/
 
 .PHONY : run2
 run2: main
 	mkdir -p statistics
 	mpirun -np 2 main<input.txt
 	mv *_mean.dat statistics/
-	mv *_block.dat statistics/	
-
+	mv *_block.dat statistics/
 .PHONY : run4
 run4: main
+	mkdir -p statistics
 	mpirun -np 4 main<input.txt
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/
 
 .PHONY : run8
 run8: main
+	mkdir -p statistics
 	mpirun -np 8 main<input.txt
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/
 
 .PHONY : run16
 run16: main
+	mkdir -p statistics
 	mpirun -np 16 main<input.txt
+	mv *_mean.dat statistics/
+	mv *_block.dat statistics/
 
 .PHONY : run32
 run32: main
 	mkdir -p statistics
 	mpirun -np 32 main<input.txt
 	mv *_mean.dat statistics/
-	mv *_block.dat statistics/	
+	mv *_block.dat statistics/
 
 .PHONY : run40
 run40: main
@@ -70,23 +117,29 @@ enter_interactive:
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
 plot: $(datafile) 
-	gnuplot .data2plots.gnu  
+	gnuplot data2plots.gnu  
 	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
-	gnuplot .data2plots_adSI.gnu 
+	gnuplot data2plots_adSI.gnu 
 	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
 
-.PHONY: plots_paralel
-plots_paralel: 
-	python3 .Analysis_prl.py
-
-## stats: generates statistics (DOES NOT WORK YET!!!)
-.PHONY: stats
-stats: $(datafile) binning
-	./binning 
-	mkdir -p statistics
-	mv *mean.dat statistics
+## paralel_plot: analyzes data in paralel, clears directories
+.PHONY: paralel_plot
+paralel_plot:
+	./ALLRUNS.sh
+	gnuplot analysis_parallel.gnu
+	mkdir -p paralel_plot
+	mv *.png paralel_plot
+	mkdir -p paralel_data
+	rm md_compile.out
+	mv *.out paralel_data
+	mv PARALELIZATION.dat paralel_data
+	mkdir -p trajectories
+	mv *.xyz trajectories
+	mkdir -p simulation_data
+	mv *.dat simulation_data
+	make super_clean
 
 ## clean: removes all .o and .mod files
 .PHONY : clean
@@ -102,7 +155,7 @@ super_clean:
 	rm -f $(EPSS)
 	rm -f *.dat
 	rm -f *.tar.gz
-
+	rm -f *.err
 ## compress: compresses all the .f90 files and the Makefile to a .tar.gz file
 .PHONY : compress
 compress:
