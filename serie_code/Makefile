@@ -20,9 +20,12 @@ main : initialize.o forces.o integrate.o thermodynamics.o binning_gestor.o main.
 run: main
 	mkdir -p statistics
 	./main < input.txt > SERIE.dat
+	gnuplot statistics2plots.gnu > fit.log
+	mv fit.log statistics
 	mv *_mean.dat statistics
 	mv *_block.dat statistics
-
+	mkdir -p statistics/Plots
+	mv *.png statistics/Plots
 
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
@@ -38,7 +41,7 @@ plot: $(datafile)
 	mkdir -p simulation_data
 	mv *.dat simulation_data
 	make super_clean
-
+	
 ## clean: removes all .o and .mod files
 .PHONY : clean
 clean:
@@ -77,5 +80,3 @@ variables:
 .PHONY : help
 help:
 	@grep '^##' Makefile
-
-
