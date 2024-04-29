@@ -63,51 +63,34 @@ cluster_compile:
 
 .PHONY : run1
 run1: main
-	mkdir -p statistics
 	mpirun -np 1 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
+	
+
 
 .PHONY : run2
 run2: main
-	mkdir -p statistics
 	mpirun -np 2 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
+
+
 .PHONY : run4
 run4: main
-	mkdir -p statistics
 	mpirun -np 4 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
 
 .PHONY : run8
 run8: main
-	mkdir -p statistics
 	mpirun -np 8 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
 
 .PHONY : run16
 run16: main
-	mkdir -p statistics
 	mpirun -np 16 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
 
 .PHONY : run32
 run32: main
-	mkdir -p statistics
 	mpirun -np 32 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
 
 .PHONY : run40
 run40: main
-	mkdir -p statistics
 	mpirun -np 40 main<input.txt
-	mv *_mean.dat statistics/
-	mv *_block.dat statistics/
 
 ## enter_interactive: enters interactive node in iqtc07
 .PHONY : enter_interactive
@@ -117,6 +100,13 @@ enter_interactive:
 ## plot: runs plots from data in datafile and move them
 .PHONY: plot
 plot: $(datafile) 
+	mkdir -p statistics
+	mkdir -p statistics/Plots
+	gnuplot statistics2plots.gnu > fit.log
+	mv *.png statistics/Plots
+	mv fit.log statistics
+	mv *_mean.dat statistics
+	mv *_block.dat statistics
 	gnuplot data2plots.gnu  
 	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
@@ -138,7 +128,10 @@ paralel_plot:
 	mkdir -p trajectories
 	mv *.xyz trajectories
 	mkdir -p simulation_data
-	mv *.dat simulation_data
+	mv results_rdf.dat simulation_data
+	mv thermo_kin+pot.dat simulation_data
+	mv thermo_temp+press.dat simulation_data
+	mv thermo_tot+msd.dat simulation_data
 	make super_clean
 
 ## clean: removes all .o and .mod files
@@ -180,6 +173,10 @@ variables:
 .PHONY : help
 help:
 	@grep '^##' Makefile
+
+
+
+
 
 
 
