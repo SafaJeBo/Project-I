@@ -5,7 +5,8 @@ datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
 EPSS=$(wildcard *.png)
 dirs2tar="Figs_SIunits" "Figs_redunits" "VMD" "simulation_data" "statistics" "trajectories"
-name4tar="EIA_MDgithub_serie.tar"
+files2tar = $(wildcard *.f90) $(wildcard *.gnu) $(wildcard *.txt) main
+name4tar="EIA_serie.tar"
 
 ## main: generates the main program
 main : initialize.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
@@ -22,7 +23,7 @@ main : initialize.o forces.o integrate.o thermodynamics.o binning_gestor.o main.
 run: main
 	mkdir -p statistics
 	./main < input.txt > SERIE.dat
-	gnuplot statistics2plots.gnu > fit.log
+	gnuplot statistics2plots.gnu
 	mv fit.log statistics
 	mv *_mean.dat statistics
 	mv *_block.dat statistics
@@ -43,6 +44,7 @@ plot: $(datafile)
 	mkdir -p simulation_data
 	mv *.dat simulation_data
 	gnuplot VMD/VMDplots.gnu
+	mv *.png VMD
 	make super_clean
 	
 ## clean: removes all .o and .mod files
@@ -63,15 +65,14 @@ super_clean:
 ## compress: compresses all the .f90 files and the Makefile to a .tar.gz file
 .PHONY : compress
 compress: 
-	tar -cvf $(name4tar)  main $(dirs2tar)
-	rm -f -rR $(dirs2tar)
-	#rm -f *.dat *.txt *.png *.xyz *.err *.out
+	tar -cvf $(name4tar) $(files2tar) $(dirs2tar)
+	rm -f -rR $(dirs2tar) $(files2tar)
 
 ## decompress: decompresses .tar.gz in current directory
 .PHONY: decompress
 decompress: 
 	tar -xvf $(name4tar)
-	rm $<
+	rm $(name4tar)
 
 
 ## variables: prints the variables used: the compiler and the optimitzator

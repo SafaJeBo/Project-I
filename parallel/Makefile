@@ -9,8 +9,8 @@ COMPILADOR=mpif90
 #OPTIMITZADOR=-O2
 numproc=2
 dirs2tar := Figs_SIunits Figs_redunits paralel_data VMD paralel_plot simulation_data statistics trajectories
-files2tar := $(wildcard *.f90) $(wildcard *.gnu) $(wildcard *.sub)
-name4tar := EIA_MDgithub.tar
+files2tar := $(wildcard *.f90) $(wildcard *.gnu) $(wildcard *.sub) $(wildcard *.txt) $(wildcard *.sh) main
+name4tar := EIA_paralel.tar
 
 #datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
@@ -22,24 +22,6 @@ main : MOD_INIT.o forces.o integrate.o thermodynamics.o binning_gestor.o main.o
 
 %.o : %.f90
 	$(COMPILADOR) -c $^
-
-## interactive_ALLRUN: runs code with all number of processors in interactive
-.PHONY : interactive_ALLRUN
-interactive_ALLRUN:
-	make run1 > 1procs.out
-	@echo "Finished 1"
-	make run2 > 2procs.out
-	@echo "Finished 2"
-	make run4 > 4procs.out
-	@echo "Finished 4"
-	make run8 > 8procs.out
-	@echo "Finished 8"
-	make run16 > 16procs.out
-	@echo "Finished 16"
-	make run32 > 32procs.out
-	@echo "Finished 32"
-	make run40 > 40procs.out
-	@echo "Finished 40"
 
 ## cluster_ALLRUN: runs code with all number of processors in cluster
 .PHONY : cluster_ALLRUN
@@ -58,10 +40,6 @@ cluster_ALLRUN:
 	qsub -pe smp 32 -o "32procs.out" submit07_runner.sub
 	rm -f 40procs.out   # Avoid overlaping
 	qsub -pe smp 40 -o "40procs.out" submit07_runner.sub
-	@echo wait...
-	@sleep 20
-	rm -f *.out
-	
 
 ## cluster_compile: compile modules in cluster
 .PHONY: cluster_compile
@@ -109,7 +87,9 @@ enter_interactive:
 plot: $(datafile) 
 	mkdir -p statistics
 	mkdir -p statistics/Plots
-	gnuplot statistics2plots.gnu > fit.log
+	gnuplot statistics2plots.gnu
+	mv *_mean.dat statistics
+	mv *_block.dat statistics
 	mv *.png statistics/Plots
 	mv fit.log statistics
 	gnuplot data2plots.gnu  
@@ -119,7 +99,7 @@ plot: $(datafile)
 	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
 	gnuplot VMD/VMDplots.gnu
-
+	mv *.png VMD
 
 ## paralel_plot: analyzes data in paralel, clears directories
 .PHONY: paralel_plot
@@ -159,15 +139,14 @@ super_clean:
 ## compress: compresses all the .f90 files and the Makefile to a .tar.gz file
 .PHONY : compress
 compress:
-	tar -cvf $(name4tar)  main  $(dirs2tar)
-	rm -f -rR $(dirs2tar)
-	#rm -f *.dat *.txt *.png *.xyz *.err *.out
+	tar -cvf $(name4tar)  $(dirs2tar) $(files2tar)
+	rm -f -rR $(dirs2tar) $(files2tar)
 
 ## decompress: decompresses .tar.gz in current directory
 .PHONY: decompress
 decompress: $(name4tar)
 	tar -xvf $(name4tar)
-	rm $<
+	rm $(name4tar)
 
 ## variables: prints the variables used: the compiler and the optimitzator
 .PHONY : variables

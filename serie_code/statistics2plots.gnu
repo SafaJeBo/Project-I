@@ -15,6 +15,8 @@ set title "Total Energy Standard Deviation vs. Block size"
 set key inside bottom right 
 set border lw 2
 set key font ",12"
+set fit quiet
+
 
 # Define fitting function
 f(x)= a - b * exp(-c * x) 
