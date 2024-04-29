@@ -8,6 +8,9 @@
 COMPILADOR=mpif90
 #OPTIMITZADOR=-O2
 numproc=2
+dirs2tar := Figs_SIunits Figs_redunits paralel_data paralel_plot simulation_data statistics trajectories
+files2tar := $(wildcard *.f90) $(wildcard *.gnu) $(wildcard *.sub)
+name4tar := EIA_MDgithub.tar
 
 #datafile=thermodynamics.dat
 compressed_file=P1_serie.tar.gz
@@ -152,12 +155,15 @@ super_clean:
 ## compress: compresses all the .f90 files and the Makefile to a .tar.gz file
 .PHONY : compress
 compress:
-	tar -czvf $(compressed_file) * ../README.md 
+	tar -cvf $(name4tar)  main  $(dirs2tar)
+	rm -f -rR $(dirs2tar)
+	#rm -f *.dat *.txt *.png *.xyz *.err *.out
 
-## decompress: decompresses .tar.gz in current directory 
+## decompress: decompresses .tar.gz in current directory
 .PHONY: decompress
-decompress: $(compressed_file)
-	tar -xvzf $(compressed_file)
+decompress: $(name4tar)
+	tar -xvf $(name4tar)
+	rm $<
 
 ## variables: prints the variables used: the compiler and the optimitzator
 .PHONY : variables
