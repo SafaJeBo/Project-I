@@ -85,7 +85,6 @@ To run the parallel program, type:
 
 
 ```
-make decompress
 chmod u+x ALLRUNS.sh
 make cluster_compile
 make cluster_ALLRUN
