@@ -8,7 +8,7 @@
 COMPILADOR=mpif90
 #OPTIMITZADOR=-O2
 numproc=2
-dirs2tar := Figs_SIunits Figs_redunits paralel_data paralel_plot simulation_data statistics trajectories
+dirs2tar := Figs_SIunits Figs_redunits paralel_data VMD paralel_plot simulation_data statistics trajectories
 files2tar := $(wildcard *.f90) $(wildcard *.gnu) $(wildcard *.sub)
 name4tar := EIA_MDgithub.tar
 
@@ -58,6 +58,10 @@ cluster_ALLRUN:
 	qsub -pe smp 32 -o "32procs.out" submit07_runner.sub
 	rm -f 40procs.out   # Avoid overlaping
 	qsub -pe smp 40 -o "40procs.out" submit07_runner.sub
+	@echo wait...
+	@sleep 20
+	rm -f *.out
+	
 
 ## cluster_compile: compile modules in cluster
 .PHONY: cluster_compile
@@ -108,14 +112,14 @@ plot: $(datafile)
 	gnuplot statistics2plots.gnu > fit.log
 	mv *.png statistics/Plots
 	mv fit.log statistics
-	mv *_mean.dat statistics
-	mv *_block.dat statistics
 	gnuplot data2plots.gnu  
 	mkdir -p Figs_redunits
 	mv *.png Figs_redunits 
 	gnuplot data2plots_adSI.gnu 
 	mkdir -p Figs_SIunits
 	mv *.png Figs_SIunits
+	gnuplot VMD/VMDplots.gnu
+
 
 ## paralel_plot: analyzes data in paralel, clears directories
 .PHONY: paralel_plot

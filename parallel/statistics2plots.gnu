@@ -20,10 +20,10 @@ set key font ",12"
 f(x)= a - b * exp(-c * x) 
 
 # Fit the function to the data
-fit f(x) 'Etot_block.dat' u 1:3 via a, b, c 
+fit f(x) 'statistics/Etot_block.dat' u 1:3 via a, b, c 
 
 # Plotting
-plot 'Etot_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
+plot 'statistics/Etot_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
          f(x) t 'Fit' w l lw 1 lc rgb "blue" lt 30
 
 # Set plot 2 parameters
@@ -36,7 +36,7 @@ set border lw 2
 set key font ",12"
 
 # Plot data with error bars
-plot 'Etot_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
+plot 'statistics/Etot_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
 
 # Reset multiplot
 unset multiplot
@@ -62,10 +62,10 @@ set key font ",12"
 f(x)= a - b * exp(-c * x)
 
 # Fit the function to the datfit f(x) 'Epot_block.dat' u 1:3 via a, b, c
-fit f(x) 'Epot_block.dat' u 1:3 via a, b, c
+fit f(x) 'statistics/Epot_block.dat' u 1:3 via a, b, c
 
 # Plotting
-plot 'Epot_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
+plot 'statistics/Epot_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
          f(x) t 'Fit' w l lw 1 lc rgb "blue" lt 30
 
 # Set plot 2 parameters
@@ -78,7 +78,7 @@ set border lw 2
 set key font ",12"
 
 # Plot data with error bars
-plot 'Epot_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
+plot 'statistics/Epot_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
 
 # Reset multiplot
 unset multiplot
@@ -104,10 +104,10 @@ set key font ",12"
 f(x)= a - b * exp(-c * x)
 
 # Fit the function to the datfit f(x) 'Ekin_block.dat' u 1:3 via a, b, c
-fit f(x) 'Ekin_block.dat' u 1:3 via a, b, c
+fit f(x) 'statistics/Ekin_block.dat' u 1:3 via a, b, c
 
 # Plotting
-plot 'Ekin_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
+plot 'statistics/Ekin_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
          f(x) t 'Fit' w l lw 1 lc rgb "blue" lt 30
 
 # Set plot 2 parameters
@@ -120,7 +120,7 @@ set border lw 2
 set key font ",12"
 
 # Plot data with error bars
-plot 'Ekin_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
+plot 'statistics/Ekin_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
 
 # Reset multiplot
 unset multiplot
@@ -145,10 +145,10 @@ set key font ",12"
 f(x)= a - b * exp(-c * x)
 
 # Fit the function to the datfit f(x) 'Epot_block.dat' u 1:3 via a, b, c
-fit f(x) 'MSD_block.dat' u 1:3 via a, b, c
+fit f(x) 'statistics/MSD_block.dat' u 1:3 via a, b, c
 
 # Plotting
-plot 'MSD_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
+plot 'statistics/MSD_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
          f(x) t 'Fit' w l lw 1 lc rgb "blue" lt 30
 
 # Set plot 2 parameters
@@ -161,7 +161,7 @@ set border lw 2
 set key font ",12"
 
 # Plot data with error bars
-plot 'MSD_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
+plot 'statistics/MSD_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
 
 # Reset multiplot
 unset multiplot
@@ -187,10 +187,10 @@ set key font ",12"
 f(x)= a - b * exp(-c * x)
 
 # Fit the function to the datfit f(x) 'Press_block.dat' u 1:3 via a, b, c
-fit f(x) 'Press_block.dat' u 1:3 via a, b, c
+fit f(x) 'statistics/Press_block.dat' u 1:3 via a, b, c
 
 # Plotting
-plot 'Press_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
+plot 'statistics/Press_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
          f(x) t 'Fit' w l lw 1 lc rgb "blue" lt 30
 
 # Set plot 2 parameters
@@ -203,7 +203,7 @@ set border lw 2
 set key font ",12"
 
 # Plot data with error bars
-plot 'Press_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
+plot 'statistics/Press_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
 
 # Reset multiplot
 unset multiplot
@@ -229,10 +229,10 @@ set key font ",12"
 f(x)= a - b * exp(-c * x)
 
 # Fit the function to the datfit f(x) 'Temp_block.dat' u 1:3 via a, b, c
-fit f(x) 'Temp_block.dat' u 1:3 via a, b, c
+fit f(x) 'statistics/Temp_block.dat' u 1:3 via a, b, c
 
 # Plotting
-plot 'Temp_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
+plot 'statistics/Temp_block.dat' u 1:3 t 'Data' with p pt 14 lc rgb "red", \
          f(x) t 'Fit' w l lw 1 lc rgb "blue" lt 30
 
 # Set plot 2 parameters
@@ -245,7 +245,7 @@ set border lw 2
 set key font ",12"
 
 # Plot data with error bars
-plot 'Temp_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
+plot 'statistics/Temp_block.dat' using 1:2:3 with yerrorbars title 'Data with Error Bars'
 
 # Reset multiplot
 unset multiplot
