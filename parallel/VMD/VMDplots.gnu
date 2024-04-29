@@ -14,7 +14,7 @@ set border lw 2
 set key font ",12"
 
 # Plotting
-plot 'gdr_parallel.dat' u 1:2  with lp pt 7 lt 10 lc rgb "blue"
+plot 'gdr_parallel.dat' u 1:2  with lp pt 7 lt 10 lc rgb "red"
 
 # Reset plot
 #unset plot
@@ -35,7 +35,7 @@ set border lw 2
 set key font ",12"
 
 # Plotting
-plot 'rmsd_parallel.dat' u 1:2  with lp pt 20 lt 1 lc rgb "blue"
+plot 'rmsd_parallel.dat' u 1:2  with lp pt 20 lt 1 lc rgb "red"
 
 # Reset plot
 #unset plot
