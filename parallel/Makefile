@@ -1,9 +1,7 @@
 
 # MAKEFILE FOR PARALEL
-# !!! COMPILING AND RUNNING IS DONE EXPECTING YOU ARE IN INTERACTIVE MODE !!! 
-# TO ACCESS IT DO:
-#			qrsh -q iqtc07.q -pe smp 1
-#			module load openmpi/4.1.4_ics-2021.3
+# This Makefile is prepared to send jobs to cluster CERQT2. However, it supports interactive node usage.  
+## For interactive node calculations load openmpi/4.1.4_ics-2021.3
 
 COMPILADOR=mpif90
 #OPTIMITZADOR=-O2
@@ -49,13 +47,10 @@ cluster_compile:
 .PHONY : run1
 run1: main
 	mpirun -np 1 main<input.txt
-	
-
 
 .PHONY : run2
 run2: main
 	mpirun -np 2 main<input.txt
-
 
 .PHONY : run4
 run4: main
@@ -104,6 +99,7 @@ plot: $(datafile)
 ## paralel_plot: analyzes data in paralel, clears directories
 .PHONY: paralel_plot
 paralel_plot:
+	chmod u+x ALLRUNS.sh
 	./ALLRUNS.sh
 	gnuplot analysis_parallel.gnu
 	mkdir -p paralel_plot
