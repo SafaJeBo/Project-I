@@ -1,15 +1,14 @@
-<div style="width: 65%;">
-<p align="right" width="100%">
-   <img src="https://github.com/Eines-Informatiques-Avancades/awesome-readme/blob/master/icon.png" alt="Logo" width="75" style="position: absolute; top: 10px; right: 10px;">
-</p>  
+
+<img src="https://github.com/Eines-Informatiques-Avancades/awesome-readme/blob/master/icon.png" align="right" />
+
    
-## MD code 	
-This repository hosts Fortran90 programs tailored for serial molecular dynamics simulations.  
+# MD code
+This repository hosts Fortran90 programs tailored for serial and parallel molecular dynamics simulations.  
 Data analysis of the generated data is conducted utilizing gnuplot.
 
 
 ## Table of Contents
-1. [Install](#install)
+1. [Installation](#installation)
    1. [Requirements](#requirements)
 2. [Serie code](#serie-code)
 	1. [Usage](#usage)
@@ -39,6 +38,8 @@ In order to run the program, the user must download the prerequisites listed bel
     ```bash
     sudo apt-get install gnuplot
     ```
+> [!IMPORTANT]
+> Parallel code uses MPI. In this project we used the version available at the CERQT2 cluster
 ## Serie Code
 
 ### Usage
@@ -55,7 +56,8 @@ make plot
 ```
 Runs plots from data in datafile and performs some folder organization.  
 
-For more commands type make help
+>[!TIP]
+>For more commands type ``make help``
 
 ###  Program structure
 
@@ -67,25 +69,27 @@ Data files 'thermodynamics.dat' and 'resultsrdflong_def.dat' will be generated c
 ####  Modules
 The modules required to compile the main program are:
 
-- forces.f90: Allows for the calculation of forces acting on the particles.
-- initialize.f90: Contains subroutines for system initialization and applying periodic boundary conditions.
-- integrate.f90: Contains subroutines for the Velocity Verlet integrator, Andersen thermostat, and Gaussian distribution.
-- thermodynamics.f90: Contains subroutines for calculating different observables of the simulation.  
+- **forces.f90**: Allows for the calculation of forces acting on the particles.
+- **initialize.f90**: Contains subroutines for system initialization and applying periodic boundary conditions.
+- **integrate.f90**: Contains subroutines for the Velocity Verlet integrator, Andersen thermostat, and Gaussian distribution.
+- **thermodynamics.f90**: Contains subroutines for calculating different observables of the simulation.  
 
 Additionally, the following files are used for proper functioning:
-- input.txt: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
-- data2plots.gnu: Generates figures from the data generated in the simulation.  
-- data2plots_adSI.gnu: Generates figures in SI units.  
-- binning_gestor.f90: Performs block average method and calculates the mean and standard deviation of observables.
+- **input.txt**: Includes input simulation parameters such as the number of particles, timestep, cutoff, temperature, among others.
+- **data2plots.gnu**: Generates figures from the data generated in the simulation.  
+- **data2plots_adSI.gnu**: Generates figures in SI units.  
+- **binning_gestor.f90**: Performs block average method and calculates the mean and standard deviation of observables.
+
+It also incorporates some VMD plots for a set of precalculated results.
 
 ## Parallel Code
-
+It contains the same functionalities as in serie, but the code is adapted for parallelization. 
+In addition, it also calculates 
 ### Usage
-To run the parallel program, type:  
+To run the parallel program, sending jobs to the cluster, type:  
 
 
 ```
-chmod u+x ALLRUNS.sh
 make cluster_compile
 make cluster_ALLRUN
 ```
@@ -97,23 +101,34 @@ make plot
 make paralel_plot
 ```
 Runs plots from data in datafile and moves them to a new folder. Organizes directory in folders.
- 
-For more commands type make help
+
+It also supports running jobs in interactive mode:
+
+```
+make enter_interactive
+cd [working directory]
+module load openmpi/4.1.4_ics-2021.3
+make runX
+```
+Where X indicates the number of desired processors. 1, 2, 4, 8, 16, 32 and 40 processors are supported through the Makefile.
+
+>[!TIP]
+>For more commands type ``make help``
 
 ##  Expected Results
 The generated plots should look like:  
 
-![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_SIunits/Esvst_SI.png)  
-Figure 1: Energy components evolution during the simulation.
+| Serie  | Parallel |
+| ------------- | ------------- |
+| ![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_SIunits/Esvst_SI.png)  | ![Energy components evolution over time](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/parallel/Figs_SIunits/Esvst_SI.png)  |
+| ![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_SIunits/PvsT_SI.png)   | ![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/parallel/Figs_SIunits/PvsT_SI.png)   |
+| ![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_redunits/RDF.png)  | ![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/parallel/Figs_redunits/RDF.png)  |
 
-![Pressure vs Temperature in reduced units](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_SIunits/PvsT_SI.png)  
-Figure 2: Pressure of the system respect to its temperature.
-
-![Radial distribution function](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/serie_code/Figs_redunits/RDF.png)  
-Figure 3: Radial distribution function of the simulation.
+Scalability of parallelization
+![Speedup](https://github.com/Eines-Informatiques-Avancades/Project-I/blob/master/parallel/paralel_plot/scalability_speedupvsP.png)
 
 ###  Justification of the results
-In this simulation, the system was modeled at a temperature T = 300K and a density of 3.749 g/L, mirroring the conditions typical of Kr gas.
+In this simulation, the system was modeled at a temperature T = 300K, mirroring the conditions typical of Kr gas.
 The interaction between particles was defined using the Lennard-Jones potential, with parameters ε/kB = 162.58 K and σ = 3.6274 angstrom.  
 The parameters were extracted from Rutkai et al. (Rutkai G.; Thol M.; Span R.; Vrabec J. How Well Does the Lennard-Jones Potential Represent the Thermodynamic Properties of Noble Gases?. Mol. Phys. 2017, 115, 1104–1121.)  
 
