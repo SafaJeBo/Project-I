@@ -2,7 +2,7 @@
 set term png size 1200,600 
 
 ################################### TOTAL ENERGY VS BLOCK SIZE ###############################
-set output 'Etot_BA.png'
+set output 'Plots/Etot_BA.png'
 
 
 set multiplot layout 1,2
@@ -46,7 +46,7 @@ set output
 
 
 ###################################### POTENTIAL ENERGY VS BLOCK SIZE ##########################
-set output 'Epot_BA.png'
+set output 'Plots/Epot_BA.png'
 set multiplot layout 1,2
 
 # Set plot 1 parameters
@@ -88,7 +88,7 @@ set output
 
 
 ########################################## KINETIC ENERGY VS BLOCK SIZE ############################
-set output 'Ekin_BA.png'
+set output 'Plots/Ekin_BA.png'
 set multiplot layout 1,2
 
 # Set plot 1 parameters
@@ -129,7 +129,7 @@ unset multiplot
 set output
 
 ################################################## MSD VS BLOCK SIZE ##############################
-set output 'MSD_BA.png'
+set output 'Plots/MSD_BA.png'
 set multiplot layout 1,2
 
 # Set plot 1 parameters
@@ -171,7 +171,7 @@ set output
 
 
 ############################################### PRESSURE VS BLOCK SIZE ############################
-set output 'Press_BA.png'
+set output 'Plots/Press_BA.png'
 set multiplot layout 1,2
 
 # Set plot 1 parameters
@@ -213,7 +213,7 @@ set output
 
 
 ######################################### TEMPERATURE VS BLOCK SIZE ###################################
-set output 'Temp_BA.png'
+set output 'Plots/Temp_BA.png'
 set multiplot layout 1,2
 
 # Set plot 1 parameters
